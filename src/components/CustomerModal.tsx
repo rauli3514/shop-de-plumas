@@ -1,0 +1,187 @@
+import React, { useState, useEffect } from 'react';
+import { useApp } from '../context/AppContext';
+import { X } from 'lucide-react';
+import type { Customer } from '../types';
+import '../components/common.css';
+
+interface CustomerModalProps {
+    customer: Customer | null;
+    onClose: () => void;
+    onCustomerCreated?: (customerId: string) => void;
+}
+
+const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCustomerCreated }) => {
+    const { addCustomer, updateCustomer } = useApp();
+    const [name, setName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
+    const [address, setAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [province, setProvince] = useState('');
+    const [notes, setNotes] = useState('');
+
+    useEffect(() => {
+        if (customer) {
+            setName(customer.name);
+            setLastName(customer.lastName || '');
+            setPhone(customer.phone);
+            setEmail(customer.email);
+            setAddress(customer.address || '');
+            setCity(customer.city || '');
+            setProvince(customer.province || '');
+            setNotes(customer.notes || '');
+        } else {
+            setName('');
+            setLastName('');
+            setPhone('');
+            setEmail('');
+            setAddress('');
+            setCity('');
+            setProvince('');
+            setNotes('');
+        }
+    }, [customer]);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const customerData = {
+            name,
+            lastName,
+            phone,
+            email,
+            address,
+            city,
+            province,
+            notes
+        };
+
+        if (customer) {
+            updateCustomer(customer.id, customerData);
+        } else {
+            const newCustomer = addCustomer(customerData);
+            if (onCustomerCreated) {
+                onCustomerCreated(newCustomer.id);
+            }
+        }
+        onClose();
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h3 className="modal-title">{customer ? 'Editar Cliente' : 'Nuevo Cliente'}</h3>
+                    <button className="btn-icon" onClick={onClose}>
+                        <X size={20} />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="modal-body">
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Nombre *</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={name}
+                                    onChange={e => setName(e.target.value)}
+                                    required
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Apellido *</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={lastName}
+                                    onChange={e => setLastName(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Teléfono *</label>
+                                <input
+                                    type="tel"
+                                    className="input"
+                                    value={phone}
+                                    onChange={e => setPhone(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    className="input"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Dirección (Calle y Número) *</label>
+                            <input
+                                type="text"
+                                className="input"
+                                value={address}
+                                onChange={e => setAddress(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Localidad</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={city}
+                                    onChange={e => setCity(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Provincia</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={province}
+                                    onChange={e => setProvince(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Observaciones</label>
+                            <textarea
+                                className="textarea"
+                                value={notes}
+                                onChange={e => setNotes(e.target.value)}
+                                placeholder="Notas adicionales sobre el cliente o entregas..."
+                                rows={3}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            Cancelar
+                        </button>
+                        <button type="submit" className="btn btn-primary">
+                            {customer ? 'Guardar Cambios' : 'Crear Cliente'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default CustomerModal;

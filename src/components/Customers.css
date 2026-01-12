@@ -1,0 +1,19 @@
+.customers {
+    animation: fadeIn var(--transition-base);
+}
+
+.customers-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .customers-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

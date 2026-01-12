@@ -1,0 +1,37 @@
+.reports {
+    animation: fadeIn var(--transition-base);
+}
+
+.reports-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.reports-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.month-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.month-selector input {
+    max-width: 200px;
+}
+
+@media (max-width: 768px) {
+    .reports-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .month-selector input {
+        max-width: 100%;
+    }
+}

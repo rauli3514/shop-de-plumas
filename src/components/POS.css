@@ -1,0 +1,183 @@
+.pos-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    animation: fadeIn var(--transition-base);
+}
+
+.pos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pos-header h2 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    background: linear-gradient(to right, var(--brand-yellow), var(--brand-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-xs);
+}
+
+.date-badge {
+    background-color: var(--color-surface);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.pos-actions-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 200px 200px;
+    gap: var(--spacing-lg);
+}
+
+.pos-card {
+    border: none;
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+}
+
+.pos-card.primary {
+    grid-row: span 2;
+    background: linear-gradient(135deg, var(--color-primary), #ffa000);
+    color: #000;
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.pos-card.primary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(255, 215, 0, 0.4);
+}
+
+.pos-card.secondary {
+    grid-row: span 2;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.pos-card.secondary:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-hover);
+}
+
+.pos-card .icon-wrapper {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    backdrop-filter: blur(4px);
+}
+
+.pos-card.secondary .icon-wrapper {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.pos-card h3 {
+    font-size: var(--font-size-2xl);
+    margin: 0 0 var(--spacing-sm) 0;
+    font-weight: 800;
+}
+
+.pos-card p {
+    margin: 0;
+    opacity: 0.8;
+    font-size: var(--font-size-sm);
+}
+
+.pos-stat-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    border: 1px solid var(--color-border-light);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+}
+
+.bg-info {
+    background-color: var(--color-info);
+}
+
+.bg-success {
+    background-color: var(--color-success);
+}
+
+.stat-content h4 {
+    margin: 0 0 4px 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.stat-value {
+    margin: 0;
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+}
+
+.pos-recent-section h3 {
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 1024px) {
+    .pos-actions-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+    }
+
+    .pos-card.primary {
+        grid-column: span 2;
+        height: 180px;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacing-xl);
+    }
+
+    .pos-card.primary .icon-wrapper {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .pos-actions-grid {
+        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pos-card.primary {
+        grid-column: span 1;
+        height: auto;
+        padding: var(--spacing-lg);
+    }
+}

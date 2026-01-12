@@ -1,0 +1,56 @@
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.payment-method-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-align: left;
+}
+
+.payment-method-btn:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-hover);
+}
+
+.payment-method-btn.active {
+    border-color: var(--color-primary);
+    background-color: hsl(220, 85%, 96%);
+    box-shadow: 0 0 0 3px hsla(220, 85%, 58%, 0.1);
+}
+
+.payment-method-btn svg {
+    flex-shrink: 0;
+    color: var(--color-primary);
+}
+
+.payment-method-btn div {
+    flex: 1;
+}
+
+.payment-method-btn strong {
+    display: block;
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-xs);
+}
+
+.payment-method-btn p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

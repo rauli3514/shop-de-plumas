@@ -1,0 +1,19 @@
+.sales {
+    animation: fadeIn var(--transition-base);
+}
+
+.sales-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .sales-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
