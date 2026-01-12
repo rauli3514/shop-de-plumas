@@ -378,63 +378,56 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                             )}
                         </div>
 
-                        {/* SECCIÓN CLIENTE */}
-                        <div className={`card ${!customerId ? 'border-warning' : ''}`} style={{ marginBottom: 'var(--spacing-lg)', padding: 'var(--spacing-md)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
-                                <label className="form-label" style={{ margin: 0 }}>Cliente (Obligatorio)</label>
+                        {/* SECCIÓN CLIENTE COMPACTA */}
+                        <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                        <label className="form-label" style={{ margin: 0 }}>Cliente</label>
+                                        {!customerId && <span style={{ fontSize: '0.75rem', color: 'var(--color-warning)' }}>* Obligatorio</span>}
+                                    </div>
+                                    <select
+                                        className="select"
+                                        value={customerId}
+                                        onChange={e => setCustomerId(e.target.value)}
+                                        required
+                                        style={{ width: '100%' }}
+                                    >
+                                        <option value="">-- Seleccionar --</option>
+                                        {customers.map(customer => (
+                                            <option key={customer.id} value={customer.id}>
+                                                {customer.name} {customer.lastName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <button
                                     type="button"
-                                    className="btn btn-secondary btn-sm"
-                                    style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }}
+                                    className="btn btn-secondary"
+                                    style={{ padding: '0.6rem', height: '42px' }}
                                     onClick={() => setShowCustomerModal(true)}
+                                    title="Nuevo Cliente"
                                 >
-                                    <UserPlus size={14} /> Nuevo Cliente
+                                    <UserPlus size={20} />
                                 </button>
                             </div>
 
-                            <select
-                                className="select"
-                                value={customerId}
-                                onChange={e => setCustomerId(e.target.value)}
-                                required
-                                style={{ borderColor: !customerId ? 'var(--color-warning)' : '' }}
-                            >
-                                <option value="">-- Seleccionar Cliente --</option>
-                                {customers.map(customer => (
-                                    <option key={customer.id} value={customer.id}>
-                                        {customer.name} {customer.lastName} - {customer.phone}
-                                    </option>
-                                ))}
-                            </select>
-                            {!customerId && (
-                                <div style={{ color: 'var(--color-warning)', fontSize: '0.8em', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <AlertCircle size={12} /> Debes seleccionar o crear un cliente
-                                </div>
-                            )}
-
-                            {/* ALERTA DE DEUDA PENDIENTE */}
+                            {/* ALERTA DE DEUDA (Mantenida igual pero con margen reducido) */}
                             {hasPendingDebt && (
                                 <div style={{
-                                    marginTop: 'var(--spacing-md)',
-                                    padding: '1rem',
+                                    marginTop: '8px',
+                                    padding: '8px 12px',
                                     backgroundColor: '#fff3cd',
-                                    border: '2px solid #ffc107',
-                                    borderRadius: 'var(--radius-md)',
+                                    border: '1px solid #ffc107',
+                                    borderRadius: '8px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '10px'
+                                    gap: '10px',
+                                    fontSize: '0.9rem'
                                 }}>
-                                    <AlertCircle size={24} color="#856404" />
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ fontWeight: 'bold', color: '#856404', marginBottom: '4px', fontSize: '1.1em' }}>
-                                            ⚠️ Cliente con Deuda Pendiente
-                                        </div>
-                                        <div style={{ color: '#856404', fontSize: '0.9em' }}>
-                                            Este cliente tiene un saldo adeudado de <strong style={{ fontSize: '1.2em' }}>${customerDebt.toFixed(2)}</strong>
-                                        </div>
-                                        <div style={{ color: '#856404', fontSize: '0.8em', marginTop: '4px', fontStyle: 'italic' }}>
-                                            💡 Puedes gestionar los pagos en "Cuentas por Cobrar"
-                                        </div>
+                                    <AlertCircle size={18} color="#856404" />
+                                    <div style={{ color: '#856404' }}>
+                                        Deuda pendiente: <strong>${customerDebt.toFixed(2)}</strong>
                                     </div>
                                 </div>
                             )}

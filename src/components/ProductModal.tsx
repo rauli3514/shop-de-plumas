@@ -12,6 +12,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
     const { addProduct, updateProduct } = useApp();
     const [name, setName] = useState('');
     const [color, setColor] = useState('');
+    const [category, setCategory] = useState('');
+    const [description, setDescription] = useState('');
     const [cost, setCost] = useState('');
     const [price, setPrice] = useState('');
     const [stock, setStock] = useState('');
@@ -24,17 +26,20 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
         if (product) {
             setName(product.name);
             setColor(product.color);
+            setCategory(product.category || '');
+            setDescription(product.description || '');
             setCost(product.cost.toString());
             setPrice(product.price.toString());
             setStock(product.stock.toString());
             setMinStock(product.minStock.toString());
-            setSupplier(product.supplier);
+            setSupplier(product.supplier || ''); // fix si supplier era opcional o string
             setStatus(product.status || 'in_stock');
             setCurrency(product.currency);
         } else {
-            // Reset for new product
             setName('');
             setColor('');
+            setCategory('');
+            setDescription('');
             setCost('');
             setPrice('');
             setStock('0');
@@ -45,12 +50,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
         }
     }, [product]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const productData = {
             name,
             color,
+            category,
+            description,
             cost: parseFloat(cost),
             price: parseFloat(price),
             stock: parseInt(stock),
@@ -61,9 +68,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
         };
 
         if (product) {
-            updateProduct(product.id, productData);
+            await updateProduct(product.id, productData);
         } else {
-            addProduct(productData);
+            await addProduct(productData);
         }
         onClose();
     };
@@ -78,10 +85,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="modal-body">
-                        {/* El Código ahora es automático, no se muestra/edita aquí */}
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+                    <div className="modal-body" style={{ overflowY: 'auto' }}>
 
+                        {/* Nombre y datos básicos */}
                         <div className="form-group">
                             <label className="form-label">Nombre del Producto</label>
                             <input
@@ -91,10 +98,11 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                                 onChange={e => setName(e.target.value)}
                                 required
                                 autoFocus
+                                placeholder="Ej: Pluma de Avestruz"
                             />
                         </div>
 
-                        <div className="form-row">
+                        <div className="form-grid-2">
                             <div className="form-group">
                                 <label className="form-label">Color / Variante</label>
                                 <input
@@ -103,23 +111,34 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                                     value={color}
                                     onChange={e => setColor(e.target.value)}
                                     required
+                                    placeholder="Ej: Rojo Intenso"
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Estado</label>
-                                <select
-                                    className="select"
-                                    value={status}
-                                    onChange={e => setStatus(e.target.value as ProductStatus)}
-                                >
-                                    <option value="in_stock">En Depósito (Disponible)</option>
-                                    <option value="incoming">En Camino (No Disponible)</option>
-                                    <option value="reserved">Reservado</option>
-                                </select>
+                                <label className="form-label">Categoría</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={category}
+                                    onChange={e => setCategory(e.target.value)}
+                                    placeholder="Ej: Plumas Largas"
+                                />
                             </div>
                         </div>
 
-                        <div className="form-row">
+                        {/* Precios y Moneda - Grid de 3 */}
+                        <div className="form-grid-3">
+                            <div className="form-group">
+                                <label className="form-label">Moneda</label>
+                                <select
+                                    className="select"
+                                    value={currency}
+                                    onChange={e => setCurrency(e.target.value as Currency)}
+                                >
+                                    <option value="ARS">ARS ($)</option>
+                                    <option value="USD">USD (U$D)</option>
+                                </select>
+                            </div>
                             <div className="form-group">
                                 <label className="form-label">Costo</label>
                                 <input
@@ -133,7 +152,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Precio de Venta</label>
+                                <label className="form-label">Precio Venta</label>
                                 <input
                                     type="number"
                                     className="input"
@@ -146,22 +165,15 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Moneda</label>
-                            <select
-                                className="select"
-                                value={currency}
-                                onChange={e => setCurrency(e.target.value as Currency)}
-                            >
-                                <option value="ARS">ARS - Peso Argentino ($)</option>
-                                <option value="USD">USD - Dólar (U$D)</option>
-                            </select>
-                            <small style={{ color: '#6b7280', display: 'block', marginTop: '4px' }}>
-                                Los precios se guardan en la moneda seleccionada
-                            </small>
+                        {/* Info de ganancia (Feedback visual rápido) */}
+                        <div style={{ marginBottom: '1rem', fontSize: '0.85rem', color: '#666', textAlign: 'right' }}>
+                            Ganancia estimada: <strong>{currency === 'USD' ? 'U$D' : '$'}{(parseFloat(price || '0') - parseFloat(cost || '0')).toFixed(2)}</strong>
+                            {' '}
+                            ({price && cost ? (((parseFloat(price) - parseFloat(cost)) / parseFloat(cost)) * 100).toFixed(0) : 0}%)
                         </div>
 
-                        <div className="form-row">
+                        {/* Stock y Estado - Grid de 3 */}
+                        <div className="form-grid-3">
                             <div className="form-group">
                                 <label className="form-label">Stock Actual</label>
                                 <input
@@ -169,32 +181,54 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                                     className="input"
                                     value={stock}
                                     onChange={e => setStock(e.target.value)}
-                                    min="0"
                                     required
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Stock Mínimo (Alerta)</label>
+                                <label className="form-label">Stock Mínimo</label>
                                 <input
                                     type="number"
                                     className="input"
                                     value={minStock}
                                     onChange={e => setMinStock(e.target.value)}
-                                    min="0"
-                                    required
                                 />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Estado</label>
+                                <select
+                                    className="select"
+                                    value={status}
+                                    onChange={e => setStatus(e.target.value as ProductStatus)}
+                                >
+                                    <option value="in_stock">Disponible</option>
+                                    <option value="incoming">En Camino</option>
+                                    <option value="reserved">Reservado</option>
+                                </select>
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">Proveedor</label>
+                            <label className="form-label">Proveedor / Notas</label>
                             <input
                                 type="text"
                                 className="input"
                                 value={supplier}
                                 onChange={e => setSupplier(e.target.value)}
+                                placeholder="Nombre del proveedor..."
                             />
                         </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Descripción</label>
+                            <textarea
+                                className="textarea"
+                                value={description}
+                                onChange={e => setDescription(e.target.value)}
+                                rows={2}
+                                placeholder="Detalles adicionales..."
+                            />
+                        </div>
+
                     </div>
 
                     <div className="modal-footer">

@@ -164,10 +164,72 @@ body {
   /* IMPORTANTE para que no se salga */
 }
 
-.input:focus {
-  outline: none;
+.input:focus,
+.select:focus,
+.textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+/* Utilidades de formulario compactas */
+.input,
+.select {
+  padding: 0.6rem 0.8rem;
+  /* Más compacto */
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+
+  .input,
+  .select {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    /* Prevenir zoom en iOS, pero compacto */
+  }
+
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .form-label {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .form-grid-2,
+  .form-grid-3,
+  .form-grid-4 {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  /* Excepción para pares pequeños como monedas o números cortos */
+  .grid-mobile-2 {
+    grid-template-columns: 1fr 1fr !important;
+  }
 }
 
 /* Botones */
