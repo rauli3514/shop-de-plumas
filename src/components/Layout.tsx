@@ -121,7 +121,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
                         ))}
                     </div>
 
-                    {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
+                    {currentUser.role === 'owner' && (
                         <div className="nav-section" style={{ marginTop: '1rem' }}>
                             <p className="nav-section-title" style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '8px', paddingLeft: '12px', fontWeight: 'bold' }}>Administración</p>
                             {adminItems.map((item) => (
@@ -140,11 +140,11 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
 
                 <div className="sidebar-footer">
                     <div className="user-info">
-                        <UserCircle size={32} />
+                        <Users size={32} />
                         <div>
                             <p className="user-name">{currentUser?.name}</p>
                             <p className="user-role badge badge-info" style={{ display: 'inline-block', fontSize: '0.7rem' }}>
-                                {currentUser?.role === 'owner' || currentUser?.role === 'admin' ? 'Administrador' : 'Vendedor'}
+                                {currentUser?.role === 'owner' ? 'Administrador' : 'Vendedor'}
                             </p>
                         </div>
                     </div>
