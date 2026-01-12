@@ -21,8 +21,8 @@ function MainApp() {
   const [currentView, setCurrentView] = useState<ViewType>('pos');
   const [loginError, setLoginError] = useState('');
 
-  const handleLogin = (username: string, password: string) => {
-    const success = login(username, password);
+  const handleLogin = async (username: string, password: string) => {
+    const success = await login(username, password);
     if (success) {
       setLoginError('');
       setCurrentView('pos'); // Redirigir a POS al login

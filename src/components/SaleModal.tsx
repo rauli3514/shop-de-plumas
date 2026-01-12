@@ -170,7 +170,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
         setItems(items.filter(item => item.productId !== productId));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!customerId) {
@@ -201,7 +201,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
         const balance = total - amountPaid;
         const paymentStatus = paymentType === 'paid' ? 'paid' : 'pending';
 
-        const { sale, deliveryNote } = addSale({
+        const result = await addSale({
             customerId: customerId,
             customerName: customer.name + ' ' + (customer.lastName || ''),
             customerAddress: customer.address || 'Sin dirección',
@@ -225,9 +225,10 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
             exchangeRateSnapshot: activeRate || undefined,
             userId: currentUser?.id,
             userName: currentUser?.name,
-        }, paymentType); // Pasar el tipo de pago seleccionado
+        }, paymentType);
 
-        if (sale && deliveryNote) {
+        if (result) {
+            const { sale, deliveryNote } = result;
             generateSalePDF(sale);
             generateDeliveryNotePDF(deliveryNote);
         }

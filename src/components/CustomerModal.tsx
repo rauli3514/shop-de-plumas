@@ -43,7 +43,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
         }
     }, [customer]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const customerData = {
@@ -58,10 +58,10 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
         };
 
         if (customer) {
-            updateCustomer(customer.id, customerData);
+            await updateCustomer(customer.id, customerData);
         } else {
-            const newCustomer = addCustomer(customerData);
-            if (onCustomerCreated) {
+            const newCustomer = await addCustomer(customerData);
+            if (newCustomer && onCustomerCreated) {
                 onCustomerCreated(newCustomer.id);
             }
         }

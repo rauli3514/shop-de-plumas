@@ -44,6 +44,8 @@ export interface Product {
   id: string;
   code: string; // Generado automáticamente
   name: string;
+  description?: string; // Nuevo
+  category?: string;    // Nuevo
   color: string;
   cost: number;
   price: number;
@@ -51,6 +53,7 @@ export interface Product {
   stock: number;
   minStock: number;
   supplier: string;
+  image_url?: string;   // Nuevo
   status: ProductStatus;
   createdAt: Date;
   updatedAt: Date;
