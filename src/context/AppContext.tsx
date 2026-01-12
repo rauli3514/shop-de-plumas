@@ -251,7 +251,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         await supabase.from('customers').delete().eq('id', id);
     };
 
-    const addSale = async (saleData: any, deliveryType = 'pending') => {
+    const addSale = async (saleData: any, _deliveryType = 'pending') => {
         const saleNumber = `V${String(sales.length + 1).padStart(6, '0')}`;
         const newSale = {
             ...saleData,
@@ -314,7 +314,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return { sale: newSale, deliveryNote };
     };
 
-    const registerPayment = async (saleId: string, amount: number, paymentMethodId: string, notes?: string) => {
+    const registerPayment = async (saleId: string, amount: number, _paymentMethodId: string, _notes?: string) => {
         // ... logica pago parcial
         setSales(prev => prev.map(s => s.id === saleId ? { ...s, amountPaid: s.amountPaid + amount, balance: s.total - (s.amountPaid + amount) } : s));
 
