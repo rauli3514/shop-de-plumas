@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { LayoutGrid, Package, TrendingUp, Users, FileText, Receipt, BarChart3, LogOut, UserCircle, Settings, ShieldCheck, ShoppingCart, DollarSign } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { LayoutGrid, Package, TrendingUp, Users, FileText, Receipt, BarChart3, LogOut, ShoppingCart, DollarSign, Settings, ShieldCheck, Menu, X } from 'lucide-react';
 import { COMPANY_INFO } from '../config/company';
 import type { ViewType, User } from '../types';
 import './Layout.css';
@@ -13,6 +13,12 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, onLogout, currentUser }) => {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const handleNavigation = (view: string) => {
+        onViewChange(view as ViewType);
+        setIsMobileMenuOpen(false);
+    };
 
     // Menú dinámico según rol
     const menuItems = [
@@ -32,9 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
         { id: 'settings', label: 'Configuración', icon: <Settings size={20} /> },
     ];
 
-    // Listener global para lector de código de barras / QR (Simulación USB)
-    // Normalmente los lectores USB envían las teclas muy rápido y terminan con Enter.
-    // Esta es una implementación básica.
+    // Listener global para lector de código de barras / QR
     useEffect(() => {
         let buffer = '';
         let lastKeyTime = Date.now();
@@ -43,7 +47,6 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
             const now = Date.now();
             const char = e.key;
 
-            // Si pasa mucho tiempo entre teclas, reiniciar buffer (usuario escribiendo manual)
             if (now - lastKeyTime > 50) {
                 buffer = '';
             }
@@ -51,10 +54,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
 
             if (char === 'Enter') {
                 if (buffer.length > 3) {
-                    // Aquí podríamos disparar una acción global si el buffer parece un código de producto
-                    // Por ahora, solo lo logueamos o lo dejamos para la vista activa
                     console.log("QR Detectado global:", buffer);
-                    // TODO: Implementar lógica global de "Scan -> Action"
                 }
                 buffer = '';
             } else if (char.length === 1) {
@@ -68,35 +68,52 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
 
     return (
         <div className="layout">
-            <aside className="sidebar">
+            {/* Overlay para cerrar menú en móvil */}
+            {isMobileMenuOpen && (
+                <div
+                    className="mobile-overlay"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
+            {/* Botón Hamburguesa Móvil */}
+            <button
+                className="mobile-menu-toggle"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{ display: 'none' }} // Controlado por CSS
+                aria-label="Menu"
+            >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                 <div className="sidebar-header">
                     <div className="logo">
                         <img
                             src={COMPANY_INFO.logoDarkUrl}
-                            alt="Shop de Plumas Logo"
+                            alt="Logo"
                             style={{
-                                width: '60px',
-                                height: '60px',
+                                width: '40px',
+                                height: '40px',
                                 borderRadius: '50%',
-                                objectFit: 'cover',
-                                marginRight: '10px'
+                                objectFit: 'cover'
                             }}
                         />
                         <div>
-                            <h1>Shop de Plumas</h1>
-                            <span className="brand-subtitle">by Lila</span>
+                            <h1>ShopPlumas</h1>
+                            <span className="brand-subtitle" style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block' }}>by Lila</span>
                         </div>
                     </div>
                 </div>
 
                 <nav className="sidebar-nav">
                     <div className="nav-section">
-                        <p className="nav-section-title">Principal</p>
-                        {menuItems.map(item => (
+                        <p className="nav-section-title" style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '8px', paddingLeft: '12px', fontWeight: 'bold' }}>Principal</p>
+                        {menuItems.map((item) => (
                             <button
                                 key={item.id}
                                 className={`nav-item ${currentView === item.id ? 'active' : ''}`}
-                                onClick={() => onViewChange(item.id as ViewType)}
+                                onClick={() => handleNavigation(item.id)}
                             >
                                 {item.icon}
                                 <span>{item.label}</span>
@@ -104,14 +121,14 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
                         ))}
                     </div>
 
-                    {currentUser.role === 'owner' && (
-                        <div className="nav-section">
-                            <p className="nav-section-title">Administración</p>
-                            {adminItems.map(item => (
+                    {(currentUser.role === 'owner' || currentUser.role === 'admin') && (
+                        <div className="nav-section" style={{ marginTop: '1rem' }}>
+                            <p className="nav-section-title" style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#666', marginBottom: '8px', paddingLeft: '12px', fontWeight: 'bold' }}>Administración</p>
+                            {adminItems.map((item) => (
                                 <button
                                     key={item.id}
                                     className={`nav-item ${currentView === item.id ? 'active' : ''}`}
-                                    onClick={() => onViewChange(item.id as ViewType)}
+                                    onClick={() => handleNavigation(item.id)}
                                 >
                                     {item.icon}
                                     <span>{item.label}</span>
@@ -125,9 +142,9 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
                     <div className="user-info">
                         <UserCircle size={32} />
                         <div>
-                            <p className="user-name">{currentUser.name}</p>
-                            <p className="user-role badge badge-info">
-                                {currentUser.role === 'owner' ? 'Propietario' : 'Vendedor'}
+                            <p className="user-name">{currentUser?.name}</p>
+                            <p className="user-role badge badge-info" style={{ display: 'inline-block', fontSize: '0.7rem' }}>
+                                {currentUser?.role === 'owner' || currentUser?.role === 'admin' ? 'Administrador' : 'Vendedor'}
                             </p>
                         </div>
                     </div>
@@ -135,6 +152,9 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
                         <LogOut size={18} />
                         <span>Cerrar Sesión</span>
                     </button>
+                    <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                        <p className="text-secondary" style={{ fontSize: '0.7rem' }}>v1.4.0</p>
+                    </div>
                 </div>
             </aside>
 
