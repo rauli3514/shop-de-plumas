@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { X, Plus, Trash2, QrCode, UserPlus, AlertCircle, Check, Pencil } from 'lucide-react';
 import type { SaleItem, Currency } from '../types';
@@ -37,6 +37,8 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
             setCustomRate(activeRate.rate.toString());
         }
     }, [activeRate]);
+
+    const quantityInputRef = useRef<HTMLInputElement>(null);
 
     const handleUpdateRate = () => {
         const newRate = parseFloat(customRate);
@@ -137,8 +139,8 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
 
     const handleAddItem = () => {
         if (!selectedProductId) return;
-        const qty = parseInt(quantity);
-        if (qty <= 0) return;
+        const qty = parseFloat(quantity); // Usar parseFloat para permitir decimales
+        if (isNaN(qty) || qty <= 0) return;
         addItemToCart(selectedProductId, qty);
     };
 
@@ -149,8 +151,19 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
             alert('Producto no encontrado');
             return;
         }
-        addItemToCart(product.id, 1);
+
+        // Cambio solicitado: No agregar automático. 
+        // Seleccionar producto y enfocar cantidad para ingreso manual.
+        setSelectedProductId(product.id);
+        setQuantity(''); // Limpiar para obligar ingreso
         setShowQRScanner(false);
+
+        // Dar foco al input de cantidad
+        setTimeout(() => {
+            if (quantityInputRef.current) {
+                quantityInputRef.current.focus();
+            }
+        }, 300); // Pequeño delay para asegurar que el modal QR cerró
     };
 
     const handleRemoveItem = (productId: string) => {
@@ -456,13 +469,15 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                                             ))}
                                     </select>
                                     <input
+                                        ref={quantityInputRef}
                                         type="number"
                                         className="input"
                                         placeholder="#"
                                         value={quantity}
                                         onChange={e => setQuantity(e.target.value)}
-                                        min="1"
-                                        style={{ width: '60px' }}
+                                        min="0.1"
+                                        step="any"
+                                        style={{ width: '80px' }}
                                     />
                                     <button
                                         type="button"
