@@ -69,23 +69,23 @@ export const initDB = () => {
 
 export const getAll = async <K extends keyof ShopDB>(storeName: K): Promise<ShopDB[K]['value'][]> => {
     const db = await initDB();
-    return db.getAll(storeName);
+    return db.getAll(storeName as any);
 };
 
 export const put = async <K extends keyof ShopDB>(storeName: K, value: ShopDB[K]['value']) => {
     const db = await initDB();
-    return db.put(storeName, value);
+    return db.put(storeName as any, value);
 };
 
 export const remove = async <K extends keyof ShopDB>(storeName: K, key: string) => {
     const db = await initDB();
-    return db.delete(storeName, key);
+    return db.delete(storeName as any, key);
 };
 
 export const bulkPut = async <K extends keyof ShopDB>(storeName: K, values: ShopDB[K]['value'][]) => {
     const db = await initDB();
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
+    const tx = db.transaction(storeName as any, 'readwrite');
+    const store = tx.objectStore(storeName as any);
     await Promise.all(values.map(val => store.put(val)));
     await tx.done;
 };
