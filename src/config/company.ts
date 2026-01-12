@@ -9,9 +9,10 @@ export const COMPANY_INFO = {
     email: "@shop_plumas",
     cuit: "",
     website: "instagram.com/shop_plumas",
-    logoUrl: "/logo.png",           // Original (fallback)
-    logoDarkUrl: "/logo-dark-circle-v2.jpg",  // Logo oscuro (aplicación)
-    logoLightUrl: "/logo-light-circle-v2.jpg", // Logo claro (PDFs)
+    // Usamos BASE_URL para que funcione tanto en local como en GitHub Pages (/shop-de-plumas/)
+    logoUrl: `${import.meta.env.BASE_URL}logo.png`,
+    logoDarkUrl: `${import.meta.env.BASE_URL}logo-dark-circle-v2.jpg`,
+    logoLightUrl: `${import.meta.env.BASE_URL}logo-light-circle-v2.jpg`,
 
     // Textos para headers/footers
     receiptHeader: "Indumentaria y Accesorios",
