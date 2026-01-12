@@ -269,28 +269,46 @@ body {
 
 /* Mobile Tweaks */
 @media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0;
+  }
+
   .modal {
-    max-height: 100dvh;
-    /* Dynamic viewport height full */
-    height: 100dvh;
-    border-radius: 0;
+    max-height: 100%;
+    height: 100%;
+    width: 100%;
     max-width: 100%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  .modal-header {
+    padding: var(--spacing-md);
+  }
+
+  .modal-body {
+    padding: var(--spacing-md);
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+    padding: var(--spacing-md);
+    /* Para asegurar que quede elevado en iPhones con barra */
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
   }
 
   .form-row {
     flex-direction: column;
-    /* Inputs apilados en móvil */
     gap: var(--spacing-sm);
-  }
-
-  .modal-buttons-mobile-stack {
-    flex-direction: column-reverse;
-    width: 100%;
   }
 
   .modal-footer .btn {
     width: 100%;
-    /* Botones full width en móvil */
+    padding: 14px;
+    /* Más área táctil */
+    margin: 0;
   }
 
   .pos-actions-grid {

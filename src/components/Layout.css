@@ -130,26 +130,69 @@
 }
 
 /* Responsive */
+/* Responsive - Bottom Navigation para Móviles */
 @media (max-width: 768px) {
     .sidebar {
-        width: 70px;
+        width: 100%;
+        height: auto;
+        min-height: 60px;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        flex-direction: row;
+        border-right: none;
+        border-top: 1px solid var(--color-border-light);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        z-index: 9999;
+        /* Soporte para iPhone con notch/isla */
+        padding-bottom: env(safe-area-inset-bottom, 20px);
+        background-color: #fff;
     }
 
     .sidebar-header {
-        padding: var(--spacing-md);
-    }
-
-    .logo h1 {
         display: none;
     }
 
-    .nav-item span {
+    .sidebar-nav {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto;
+        padding: 4px;
+        gap: 2px;
+        /* Ocultar barra de scroll pero permitir scroll */
+        scrollbar-width: none; 
+    }
+    .sidebar-nav::-webkit-scrollbar {
         display: none;
     }
 
     .nav-item {
+        flex-direction: column;
         justify-content: center;
-        padding: var(--spacing-md) var(--spacing-sm);
+        align-items: center;
+        padding: 6px 2px;
+        margin: 0;
+        min-width: 60px;
+        flex: 1;
+        gap: 4px;
+    }
+
+    .nav-item svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    /* Mostrar etiquetas de texto pequeñas */
+    .nav-item span {
+        display: block;
+        font-size: 10px;
+        text-align: center;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
     .sidebar-footer {
@@ -157,10 +200,12 @@
     }
 
     .main-content {
-        margin-left: 70px;
+        margin-left: 0;
+        /* Espacio para que el contenido no quede tapado por la barra */
+        margin-bottom: 80px; 
     }
 
     .content-wrapper {
-        padding: var(--spacing-lg);
+        padding: 10px;
     }
 }

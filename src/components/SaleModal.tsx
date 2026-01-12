@@ -252,97 +252,6 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
 
                 <div className="modal-header">
                     <h3 className="modal-title">Nueva Venta</h3>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <label style={{ fontSize: '0.9rem', color: '#666' }}>Moneda:</label>
-                            <select
-                                className="select"
-                                style={{ width: 'auto', padding: '4px 8px', fontSize: '0.9rem' }}
-                                value={saleCurrency}
-                                onChange={(e) => {
-                                    if (items.length > 0) {
-                                        if (confirm('Cambiar la moneda recalculará los precios del carrito. ¿Continuar?')) {
-                                            setSaleCurrency(e.target.value as Currency);
-                                            // TODO: Recalcular items si cambio la moneda (opcional, por ahora solo avisamos)
-                                            setItems([]); // Limpiamos carrito por seguridad para MVP
-                                        }
-                                    } else {
-                                        setSaleCurrency(e.target.value as Currency);
-                                    }
-                                }}
-                            >
-                                <option value="ARS">ARS ($)</option>
-                                <option value="USD">USD (U$D)</option>
-                            </select>
-                        </div>
-                        {saleCurrency === 'ARS' && (
-                            <div style={{ fontSize: '0.9rem', color: '#666', display: 'flex', alignItems: 'center' }}>
-                                Cotización USD:
-                                {isEditingRate ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', marginLeft: '5px' }}>
-                                        <span style={{ marginRight: '2px' }}>$</span>
-                                        <input
-                                            type="number"
-                                            value={customRate}
-                                            onChange={(e) => setCustomRate(e.target.value)}
-                                            style={{
-                                                width: '70px',
-                                                padding: '2px 4px',
-                                                border: '1px solid var(--primary-color)',
-                                                borderRadius: '4px',
-                                                fontSize: '0.9rem'
-                                            }}
-                                            autoFocus
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={handleUpdateRate}
-                                            className="btn-icon"
-                                            style={{ marginLeft: '4px', color: 'green' }}
-                                            title="Guardar"
-                                        >
-                                            <Check size={16} />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsEditingRate(false)}
-                                            className="btn-icon"
-                                            style={{ marginLeft: '2px', color: 'red' }}
-                                            title="Cancelar"
-                                        >
-                                            <X size={16} />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <span style={{ fontWeight: 'bold', marginLeft: '4px' }}>
-                                            ${activeRate ? activeRate.rate : '---'}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setCustomRate(activeRate ? activeRate.rate.toString() : '');
-                                                setIsEditingRate(true);
-                                            }}
-                                            className="btn-icon"
-                                            style={{ marginLeft: '4px', color: '#666', cursor: 'pointer' }}
-                                            title="Editar cotización"
-                                        >
-                                            <Pencil size={14} />
-                                        </button>
-                                    </>
-                                )}
-                                <a
-                                    href={EXCHANGE_RATE_URL}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ marginLeft: '8px', fontSize: '0.8rem', color: 'var(--primary-color)' }}
-                                >
-                                    (Ver DolarHoy)
-                                </a>
-                            </div>
-                        )}
-                    </div>
                     <button className="btn-icon" onClick={onClose}>
                         <X size={20} />
                     </button>
@@ -350,6 +259,110 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
                     <div className="modal-body" style={{ flex: 1, overflowY: 'auto' }}>
+
+                        {/* CONFIGURACIÓN MONEDA Y COTIZACIÓN (Movido aquí para mejor UI Mobile) */}
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            gap: '15px',
+                            marginBottom: 'var(--spacing-lg)',
+                            padding: '12px',
+                            backgroundColor: 'rgba(0,0,0,0.03)',
+                            borderRadius: '8px',
+                            border: '1px solid var(--color-border-light)'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <label style={{ fontSize: '0.9rem', color: '#666' }}>Moneda:</label>
+                                <select
+                                    className="select"
+                                    style={{ width: 'auto', padding: '4px 8px', fontSize: '0.9rem' }}
+                                    value={saleCurrency}
+                                    onChange={(e) => {
+                                        if (items.length > 0) {
+                                            if (confirm('Cambiar la moneda recalculará los precios del carrito. ¿Continuar?')) {
+                                                setSaleCurrency(e.target.value as Currency);
+                                                // TODO: Recalcular items si cambio la moneda
+                                                setItems([]);
+                                            }
+                                        } else {
+                                            setSaleCurrency(e.target.value as Currency);
+                                        }
+                                    }}
+                                >
+                                    <option value="ARS">ARS ($)</option>
+                                    <option value="USD">USD (U$D)</option>
+                                </select>
+                            </div>
+
+                            {saleCurrency === 'ARS' && (
+                                <div style={{ fontSize: '0.9rem', color: '#666', display: 'flex', alignItems: 'center' }}>
+                                    Cotización USD:
+                                    {isEditingRate ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', marginLeft: '5px' }}>
+                                            <span style={{ marginRight: '2px' }}>$</span>
+                                            <input
+                                                type="number"
+                                                value={customRate}
+                                                onChange={(e) => setCustomRate(e.target.value)}
+                                                style={{
+                                                    width: '70px',
+                                                    padding: '2px 4px',
+                                                    border: '1px solid var(--primary-color)',
+                                                    borderRadius: '4px',
+                                                    fontSize: '0.9rem'
+                                                }}
+                                                autoFocus
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={handleUpdateRate}
+                                                className="btn-icon"
+                                                style={{ marginLeft: '4px', color: 'green' }}
+                                                title="Guardar"
+                                            >
+                                                <Check size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsEditingRate(false)}
+                                                className="btn-icon"
+                                                style={{ marginLeft: '2px', color: 'red' }}
+                                                title="Cancelar"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <span style={{ fontWeight: 'bold', marginLeft: '4px' }}>
+                                                ${activeRate ? activeRate.rate : '---'}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setCustomRate(activeRate ? activeRate.rate.toString() : '');
+                                                    setIsEditingRate(true);
+                                                }}
+                                                className="btn-icon"
+                                                style={{ marginLeft: '4px', color: '#666', cursor: 'pointer' }}
+                                                title="Editar cotización"
+                                            >
+                                                <Pencil size={14} />
+                                            </button>
+                                        </>
+                                    )}
+                                    <a
+                                        href={EXCHANGE_RATE_URL}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ marginLeft: '8px', fontSize: '0.8rem', color: 'var(--primary-color)' }}
+                                    >
+                                        (DolarHoy)
+                                    </a>
+                                </div>
+                            )}
+                        </div>
 
                         {/* SECCIÓN CLIENTE */}
                         <div className={`card ${!customerId ? 'border-warning' : ''}`} style={{ marginBottom: 'var(--spacing-lg)', padding: 'var(--spacing-md)' }}>
@@ -416,16 +429,17 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                         {/* SECCIÓN PRODUCTOS */}
                         <div className="form-group">
                             <label className="form-label">Productos</label>
-                            <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-md)' }}>
+                            <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-md)', flexWrap: 'wrap' }}>
                                 <button
                                     type="button"
                                     className="btn btn-secondary"
                                     onClick={() => setShowQRScanner(true)}
+                                    style={{ flex: 1, minWidth: '120px' }}
                                 >
                                     <QrCode size={18} /> Scannear (Cam)
                                 </button>
 
-                                <div style={{ flex: 1, display: 'flex', gap: 'var(--spacing-sm)' }}>
+                                <div style={{ flex: 2, display: 'flex', gap: 'var(--spacing-sm)', minWidth: '200px' }}>
                                     <select
                                         className="select"
                                         value={selectedProductId}
@@ -448,7 +462,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                                         value={quantity}
                                         onChange={e => setQuantity(e.target.value)}
                                         min="1"
-                                        style={{ width: '80px' }}
+                                        style={{ width: '60px' }}
                                     />
                                     <button
                                         type="button"
