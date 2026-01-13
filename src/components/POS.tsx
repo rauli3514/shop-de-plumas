@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { ShoppingCart, Package, Users, QrCode } from 'lucide-react';
 import SaleModal from './SaleModal';
 import QRScannerModal from './QRScannerModal';
+import ProductInfoModal from './ProductInfoModal';
 import './POS.css';
 
 const POS: React.FC = () => {
@@ -10,11 +11,14 @@ const POS: React.FC = () => {
     const [showSaleModal, setShowSaleModal] = useState(false);
     const [showQRScanner, setShowQRScanner] = useState(false);
     const [preScannedProduct, setPreScannedProduct] = useState<string | null>(null);
+    const [showProductInfoModal, setShowProductInfoModal] = useState(false);
+    const [infoProductId, setInfoProductId] = useState<string | null>(null);
 
     const handleQRScan = (productId: string) => {
-        setPreScannedProduct(productId);
+        // En lugar de iniciar venta, abrimos modal de info
+        setInfoProductId(productId);
         setShowQRScanner(false);
-        setShowSaleModal(true);
+        setShowProductInfoModal(true);
     };
 
     const recentActivity = stockMovements.slice(-5).reverse();
@@ -44,8 +48,8 @@ const POS: React.FC = () => {
                     <div className="icon-wrapper">
                         <QrCode size={48} />
                     </div>
-                    <h3>Escanear QR</h3>
-                    <p>Iniciar venta escaneando producto</p>
+                    <h3>Consultar Precio</h3>
+                    <p>Buscar producto y ver stock/precio</p>
                 </button>
 
                 {/* Accesos rápidos que podrían redirigir o abrir modales */}
@@ -110,6 +114,16 @@ const POS: React.FC = () => {
                         setPreScannedProduct(null);
                     }}
                     initialProductId={preScannedProduct}
+                />
+            )}
+
+            {showProductInfoModal && infoProductId && (
+                <ProductInfoModal
+                    productId={infoProductId}
+                    onClose={() => {
+                        setShowProductInfoModal(false);
+                        setInfoProductId(null);
+                    }}
                 />
             )}
 
