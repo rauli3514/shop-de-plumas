@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      filename: 'manifest.json', // Nombre exacto requerido
+      manifestFilename: 'manifest.json', // Nombre correcto para el manifest
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'Shop de Plumas',
