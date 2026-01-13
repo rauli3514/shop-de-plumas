@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { Download, Calendar } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { formatCurrency } from '../utils/currency';
 import { generateMonthlyReportPDF } from '../utils/pdfGenerator';
 import './Reports.css';
 
@@ -11,7 +12,9 @@ const Reports: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
 
     const monthStats = useMemo(() => {
-        const monthDate = new Date(selectedMonth + '-01');
+        // Fix zona horaria: crear fecha local explícita usando componentes
+        const [year, month] = selectedMonth.split('-').map(Number);
+        const monthDate = new Date(year, month - 1, 1); // Mes 0-indexado en constructor Date
         const start = startOfMonth(monthDate);
         const end = endOfMonth(monthDate);
 
@@ -104,7 +107,7 @@ const Reports: React.FC = () => {
                 <div className="stat-card">
                     <div className="stat-content">
                         <p className="stat-label">Ingresos Totales</p>
-                        <p className="stat-value">${monthStats.totalSales.toFixed(2)}</p>
+                        <p className="stat-value">{formatCurrency(monthStats.totalSales, 'ARS')}</p>
                         <p className="stat-subtitle">del mes</p>
                     </div>
                 </div>
@@ -112,7 +115,7 @@ const Reports: React.FC = () => {
                 <div className="stat-card">
                     <div className="stat-content">
                         <p className="stat-label">Costo Total</p>
-                        <p className="stat-value">${monthStats.totalCost.toFixed(2)}</p>
+                        <p className="stat-value">{formatCurrency(monthStats.totalCost, 'ARS')}</p>
                         <p className="stat-subtitle">del mes</p>
                     </div>
                 </div>
@@ -120,7 +123,7 @@ const Reports: React.FC = () => {
                 <div className="stat-card">
                     <div className="stat-content">
                         <p className="stat-label">Ganancia Total</p>
-                        <p className="stat-value text-success">${monthStats.totalProfit.toFixed(2)}</p>
+                        <p className="stat-value text-success">{formatCurrency(monthStats.totalProfit, 'ARS')}</p>
                         <p className="stat-subtitle">del mes</p>
                     </div>
                 </div>
@@ -150,7 +153,7 @@ const Reports: React.FC = () => {
                                             <td>{item.product.name}</td>
                                             <td>{item.product.color}</td>
                                             <td><strong>{item.quantity}</strong></td>
-                                            <td className="text-success"><strong>${item.revenue.toFixed(2)}</strong></td>
+                                            <td className="text-success"><strong>{formatCurrency(item.revenue, 'ARS')}</strong></td>
                                         </tr>
                                     ))}
                                 </tbody>
