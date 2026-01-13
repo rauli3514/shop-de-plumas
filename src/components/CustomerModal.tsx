@@ -80,12 +80,13 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
 
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
-                        <div className="form-row">
+                        <div className="form-row grid-mobile-2">
                             <div className="form-group">
                                 <label className="form-label">Nombre *</label>
                                 <input
                                     type="text"
                                     className="input"
+                                    placeholder="Nombre"
                                     value={name}
                                     onChange={e => setName(e.target.value)}
                                     required
@@ -97,6 +98,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
                                 <input
                                     type="text"
                                     className="input"
+                                    placeholder="Apellido"
                                     value={lastName}
                                     onChange={e => setLastName(e.target.value)}
                                     required
@@ -104,12 +106,13 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
                             </div>
                         </div>
 
-                        <div className="form-row">
+                        <div className="form-row grid-mobile-2">
                             <div className="form-group">
                                 <label className="form-label">Teléfono *</label>
                                 <input
                                     type="tel"
                                     className="input"
+                                    placeholder="Teléfono"
                                     value={phone}
                                     onChange={e => setPhone(e.target.value)}
                                     required
@@ -120,6 +123,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
                                 <input
                                     type="email"
                                     className="input"
+                                    placeholder="Email (Opcional)"
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
                                 />
@@ -127,22 +131,24 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">Dirección (Calle y Número) *</label>
+                            <label className="form-label">Dirección *</label>
                             <input
                                 type="text"
                                 className="input"
+                                placeholder="Calle y Número"
                                 value={address}
                                 onChange={e => setAddress(e.target.value)}
                                 required
                             />
                         </div>
 
-                        <div className="form-row">
+                        <div className="form-row grid-mobile-2">
                             <div className="form-group">
                                 <label className="form-label">Localidad</label>
                                 <input
                                     type="text"
                                     className="input"
+                                    placeholder="Ciudad"
                                     value={city}
                                     onChange={e => setCity(e.target.value)}
                                 />
@@ -152,6 +158,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
                                 <input
                                     type="text"
                                     className="input"
+                                    placeholder="Provincia"
                                     value={province}
                                     onChange={e => setProvince(e.target.value)}
                                 />

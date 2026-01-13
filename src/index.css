@@ -505,3 +505,31 @@ body {
   background: rgba(0, 255, 255, 0.2);
   color: var(--color-info);
 }
+/* --- MEJORAS MÓVILES EXTREMAS --- */
+@media (max-width: 600px) {
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 95dvh !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    margin: 0 !important;
+    position: absolute !important;
+    bottom: 0 !important;
+  }
+
+  .modal-body {
+    flex-grow: 0 !important; /* Evitar que estire y genere huecos */
+    padding: 0.75rem !important;
+  }
+
+  .grid-mobile-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+  
+  .form-group {
+    margin-bottom: 0.5rem !important;
+  }
+}
