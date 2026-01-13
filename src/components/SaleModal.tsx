@@ -254,23 +254,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal sale-modal-content" onClick={e => e.stopPropagation()}>
-                <style>{`
-                    .sale-modal-content {
-                        max-width: 900px;
-                        height: 90vh;
-                        display: flex;
-                        flex-direction: column;
-                    }
-                    @media (max-width: 768px) {
-                        .sale-modal-content {
-                            width: 100vw !important;
-                            height: 100vh !important;
-                            max-width: none !important;
-                            max-height: none !important;
-                            border-radius: 0;
-                        }
-                    }
-                `}</style>
+                {/* Estilos inline eliminados para usar CSS global consistente */}
 
                 <div className="modal-header">
                     <h3 className="modal-title">Nueva Venta</h3>
