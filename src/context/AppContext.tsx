@@ -268,7 +268,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         // Mapear campos camelCase a snake_case DB
         const dbSale = {
             id: newSale.id,
-            sale_number: 0, // Serial en DB
+            // sale_number: 0, // REMOVIDO: Dejar que DB autogenere el serial
             customer_id: newSale.customerId,
             customer_name: newSale.customerName,
             subtotal: newSale.subtotal,
@@ -285,7 +285,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const { error } = await supabase.from('sales').insert(dbSale);
         if (error) {
             console.error("Error sales DB", error);
-            alert("Error creando venta en nube. Revise internet.");
+            alert(`Error creando venta en nube: ${error.message || JSON.stringify(error)}`);
             return null;
         }
 
