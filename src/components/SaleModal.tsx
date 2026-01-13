@@ -74,9 +74,17 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
     }, [paymentMethods, selectedPaymentMethodId]);
 
     // Manejar producto inicial (escaneado antes de abrir modal)
+    // Manejar producto inicial (escaneado antes de abrir modal)
     useEffect(() => {
         if (initialProductId) {
-            addItemToCart(initialProductId, 1);
+            setSelectedProductId(initialProductId);
+            setQuantity(''); // Permitir ingreso manual
+            // Dar foco
+            setTimeout(() => {
+                if (quantityInputRef.current) {
+                    quantityInputRef.current.focus();
+                }
+            }, 500);
         }
     }, [initialProductId]);
 
