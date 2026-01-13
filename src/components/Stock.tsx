@@ -5,7 +5,7 @@ import StockModal from './StockModal';
 import './Stock.css';
 
 const Stock: React.FC = () => {
-    const { products, stockMovements, currentUser } = useApp();
+    const { products, stockMovements, currentUser, users } = useApp();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'in_stock' | 'incoming'>('all');
@@ -129,12 +129,15 @@ const Stock: React.FC = () => {
                                 <th>Tipo</th>
                                 <th>Producto</th>
                                 <th>Cant.</th>
+                                <th>Usuario</th>
                                 <th>Notas</th>
                             </tr>
                         </thead>
                         <tbody>
+
                             {recentMovements.map(move => {
                                 const product = products.find(p => p.id === move.productId);
+                                const user = users.find(u => u.id === move.userId);
                                 return (
                                     <tr key={move.id}>
                                         <td>{new Date(move.date).toLocaleDateString()} {new Date(move.date).toLocaleTimeString()}</td>
@@ -151,6 +154,9 @@ const Stock: React.FC = () => {
                                         </td>
                                         <td>{product ? product.name : 'Producto Eliminado'}</td>
                                         <td>{move.quantity}</td>
+                                        <td className="text-info font-bold" style={{ fontSize: '0.9rem' }}>
+                                            {user ? user.name : (move.userId ? 'Usuario Eliminado' : 'Sistema')}
+                                        </td>
                                         <td className="text-muted">{move.notes}</td>
                                     </tr>
                                 );

@@ -195,7 +195,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 }));
                 setDeliveryNotes(generatedDeliveryNotes);
 
-                setStockMovements(dbMovements);
+                // Mapear Movimientos de Stock
+                const mapMovementFromDB = (m: any): StockMovement => ({
+                    id: m.id,
+                    productId: m.product_id || m.productId,
+                    quantity: Number(m.quantity),
+                    cost: Number(m.cost || 0),
+                    type: m.type,
+                    date: new Date(m.date || m.created_at),
+                    notes: m.reason || m.notes || '', // Schema usa 'reason', App usa 'notes'
+                    userId: m.user_id || m.userId,
+                });
+
+                setStockMovements(dbMovements.map(mapMovementFromDB));
                 setUsers(dbUsers); // Si no hay en DB, usamos memoria pero NO guardamos en DB automático para no ensuciar
 
                 // Tipos de cambio: Si vacío, crear default
@@ -388,22 +400,51 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             return null;
         }
 
-        // Actualizar stock (esto idealmente lo hace un trigger en DB, pero lo hago manual aquí)
-        // en background
+        // Actualizar stock y registrar movimientos
         newSale.items.forEach(async (item: any) => {
             const prod = products.find(p => p.id === item.productId);
             if (prod) {
                 const newStock = prod.stock - item.quantity;
-                // Update local
+
+                // 1. Actualizar producto local y DB
                 updateProduct(item.productId, { stock: newStock });
+
+                // 2. Registrar Movimiento de Stock
+                const newMoId = crypto.randomUUID();
+                const now = new Date();
+
+                // State update
+                const stateMove: StockMovement = {
+                    id: newMoId,
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    cost: prod.cost,
+                    type: 'out',
+                    date: now,
+                    notes: `Venta ${saleNumber}`,
+                    userId: currentUser?.id
+                };
+                setStockMovements(prev => [stateMove, ...prev]);
+
+                // DB Insert
+                const dbMove = {
+                    id: newMoId,
+                    product_id: item.productId,
+                    type: 'out',
+                    quantity: item.quantity,
+                    cost: prod.cost,
+                    previous_stock: prod.stock,
+                    new_stock: newStock,
+                    reason: `Venta ${saleNumber}`,
+                    reference_id: newSale.id,
+                    user_id: currentUser?.id,
+                    date: now,
+                    created_at: now
+                };
+
+                const { error: smError } = await supabase.from('stock_movements').insert(dbMove);
+                if (smError) console.error("Error creating stock movement", smError);
             }
-            // Insertar movimiento stock
-            await supabase.from('stock_movements').insert({
-                product_id: item.productId,
-                type: 'sale',
-                quantity: item.quantity,
-                created_at: new Date()
-            });
         });
 
         // Generar Remito (Local - DeliveryNotes no tiene tabla SQL en este script básico aun, usamos local state)
