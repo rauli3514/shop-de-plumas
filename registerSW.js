@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/shop-de-plumas/manifest.json', { scope: '/shop-de-plumas/' })})}
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/shop-de-plumas/sw.js', { scope: '/shop-de-plumas/' })})}
