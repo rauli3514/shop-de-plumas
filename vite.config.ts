@@ -4,36 +4,33 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/shop-de-plumas/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      filename: 'manifest.json', // Nombre exacto requerido
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'Shop de Plumas',
         short_name: 'ShopPlumas',
         description: 'Sistema de Gestión - Shop de Plumas by Lila',
-        theme_color: '#ffffff',
+        theme_color: '#111111',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/',
+        scope: '/shop-de-plumas/',
+        start_url: '/shop-de-plumas/',
         orientation: 'portrait',
         icons: [
           {
-            src: '/logo-dark-circle-v2.jpg',
+            src: '/shop-de-plumas/icons/icon-192.png',
             sizes: '192x192',
-            type: 'image/jpeg'
+            type: 'image/png'
           },
           {
-            src: '/logo-dark-circle-v2.jpg',
+            src: '/shop-de-plumas/icons/icon-512.png',
             sizes: '512x512',
-            type: 'image/jpeg'
-          },
-          {
-            src: '/logo-dark-circle-v2.jpg',
-            sizes: '512x512',
-            type: 'image/jpeg',
-            purpose: 'any maskable'
+            type: 'image/png'
           }
         ]
       },
