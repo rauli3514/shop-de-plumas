@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Package } from 'lucide-react';
+import { formatCurrency } from '../utils/currency';
 import '../components/common.css';
 
 interface ProductInfoModalProps {
@@ -21,7 +22,7 @@ const ProductInfoModal: React.FC<ProductInfoModalProps> = ({ productId, onClose 
     if (product.currency === 'USD') {
         const rate = getActiveExchangeRate('USD', 'ARS');
         if (rate) {
-            alternativePrice = `≈ $${(product.price * rate.rate).toFixed(0)} ARS`;
+            alternativePrice = `≈ ${formatCurrency(product.price * rate.rate, 'ARS')}`;
         }
     }
 
@@ -53,7 +54,7 @@ const ProductInfoModal: React.FC<ProductInfoModalProps> = ({ productId, onClose 
                     <div style={{ background: 'var(--color-bg)', padding: '1rem', borderRadius: 'var(--radius-md)', width: '100%' }}>
                         <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Precio</div>
                         <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                            {product.currency === 'USD' ? 'U$D ' : '$'}{product.price}
+                            {formatCurrency(product.price, product.currency)}
                         </div>
                         {alternativePrice && (
                             <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>{alternativePrice}</div>

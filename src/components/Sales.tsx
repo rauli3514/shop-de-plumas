@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Search, Download } from 'lucide-react';
 import { generateSalePDF } from '../utils/pdfGenerator';
+import { formatCurrency } from '../utils/currency';
 import SaleDetailModal from './SaleDetailModal';
 import './Sales.css';
 
@@ -65,9 +66,9 @@ const Sales: React.FC = () => {
                                 <td>{new Date(sale.date).toLocaleDateString()} {new Date(sale.date).toLocaleTimeString()}</td>
                                 <td className="font-mono font-bold">{sale.saleNumber}</td>
                                 <td>{sale.customerName}</td>
-                                <td className="font-bold text-primary">${sale.total.toFixed(2)}</td>
+                                <td className="font-bold text-primary">{formatCurrency(sale.total, sale.currency)}</td>
                                 {isOwner && (
-                                    <td className="text-success">+${sale.totalProfit?.toFixed(2) || '0.00'}</td>
+                                    <td className="text-success">+{formatCurrency(sale.totalProfit || 0, sale.currency)}</td>
                                 )}
                                 <td>{sale.userName || 'Desconocido'}</td>
                                 <td>

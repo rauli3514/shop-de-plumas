@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { X, Plus, Trash2, QrCode, UserPlus, AlertCircle, Check, Pencil } from 'lucide-react';
 import type { SaleItem, Currency } from '../types';
 import { generateSalePDF, generateDeliveryNotePDF } from '../utils/pdfGenerator';
-import { convertCurrency } from '../utils/currency';
+import { convertCurrency, formatCurrency } from '../utils/currency';
 import QRScannerModal from './QRScannerModal';
 import CustomerModal from './CustomerModal';
 import '../components/common.css';
@@ -369,7 +369,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                                     {products
                                         .filter(p => p.status === 'in_stock' && p.stock > 0)
                                         .map(p => (
-                                            <option key={p.id} value={p.id}>{p.name} - ${p.price}</option>
+                                            <option key={p.id} value={p.id}>{p.name} - {formatCurrency(p.price, p.currency)}</option>
                                         ))}
                                 </select>
 
@@ -412,10 +412,10 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                                             <tr key={item.productId}>
                                                 <td style={{ padding: '4px', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                     {item.productName}
-                                                    <div style={{ fontSize: '0.75em', color: 'var(--color-text-muted)' }}>${item.unitPrice}</div>
+                                                    <div style={{ fontSize: '0.75em', color: 'var(--color-text-muted)' }}>{formatCurrency(item.unitPrice, saleCurrency)}</div>
                                                 </td>
                                                 <td style={{ padding: '4px', textAlign: 'center' }}>{item.quantity}</td>
-                                                <td style={{ padding: '4px', textAlign: 'right', fontWeight: 'bold' }}>${item.subtotal.toFixed(0)}</td>
+                                                <td style={{ padding: '4px', textAlign: 'right', fontWeight: 'bold' }}>{formatCurrency(item.subtotal, saleCurrency)}</td>
                                                 <td style={{ padding: '4px', textAlign: 'right' }}>
                                                     <button
                                                         type="button"
@@ -467,17 +467,17 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                                 <div style={{ marginTop: 'var(--spacing-lg)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-md)' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                         <span>Subtotal:</span>
-                                        <strong>${subtotal.toFixed(2)}</strong>
+                                        <strong>{formatCurrency(subtotal, saleCurrency)}</strong>
                                     </div>
                                     {surcharge > 0 && (
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'var(--color-warning)' }}>
                                             <span>Recargo ({surchargePercent}%):</span>
-                                            <strong>+${surcharge.toFixed(2)}</strong>
+                                            <strong>+{formatCurrency(surcharge, saleCurrency)}</strong>
                                         </div>
                                     )}
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--spacing-md)', fontSize: '1.5em' }}>
                                         <span>Total:</span>
-                                        <strong className="text-primary">${total.toFixed(2)}</strong>
+                                        <strong className="text-primary">{formatCurrency(total, saleCurrency)}</strong>
                                     </div>
 
                                     {/* Opciones de Tipo de Pago */}
@@ -609,9 +609,9 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                             disabled={items.length === 0 || !customerId}
                             style={{ minWidth: '220px' }}
                         >
-                            {paymentType === 'paid' ? `✓ Cobrar $${total.toFixed(2)}` :
-                                paymentType === 'cash_on_delivery' ? `🚚 Contra Entrega $${total.toFixed(2)}` :
-                                    `📋 A Cuenta $${total.toFixed(2)}`}
+                            {paymentType === 'paid' ? `✓ Cobrar ${formatCurrency(total, saleCurrency)}` :
+                                paymentType === 'cash_on_delivery' ? `🚚 Contra Entrega ${formatCurrency(total, saleCurrency)}` :
+                                    `📋 A Cuenta ${formatCurrency(total, saleCurrency)}`}
                         </button>
                     </div>
                 </form>

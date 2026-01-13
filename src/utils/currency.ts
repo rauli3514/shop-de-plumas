@@ -4,8 +4,8 @@ import type { Currency, ExchangeRate, CurrencyAmount } from '../types';
 export const SUPPORTED_CURRENCIES: Currency[] = ['ARS', 'USD'];
 
 export const CURRENCY_SYMBOLS: Record<Currency, string> = {
-    ARS: '$',
-    USD: 'U$D'
+    ARS: 'ARG$',
+    USD: 'US$'
 };
 
 export const CURRENCY_NAMES: Record<Currency, string> = {
