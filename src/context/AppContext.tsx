@@ -142,7 +142,59 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 });
 
                 setCustomers(dbCustomers.map(mapCustomerFromDB));
-                setSales(dbSales);
+
+                // Mapear Ventas snake_case -> camelCase
+                const mapSaleFromDB = (s: any): Sale => ({
+                    id: s.id,
+                    saleNumber: typeof s.sale_number === 'number' ? `V${String(s.sale_number).padStart(6, '0')}` : (s.sale_number || s.saleNumber || 'V---'),
+                    customerId: s.customer_id,
+                    customerName: s.customer_name || 'Cliente Final',
+                    customerAddress: '',
+                    items: s.items || [],
+                    subtotal: s.subtotal || 0,
+                    total: s.total || 0,
+                    currency: s.currency || 'ARS',
+                    payment: {
+                        methodId: 'db',
+                        methodName: s.payment_method || 'Varios',
+                        subtotal: s.subtotal || 0,
+                        surcharge: s.surcharge || 0,
+                        total: s.total || 0
+                    },
+                    paymentStatus: s.payment_status || 'paid',
+                    amountPaid: s.amount_paid || 0,
+                    balance: s.balance || 0,
+                    totalCost: s.total_cost || 0,
+                    totalProfit: s.total_profit || 0,
+                    date: new Date(s.date || s.created_at),
+                    notes: s.notes,
+                    userId: s.user_id,
+                    userName: s.user_name
+                });
+
+                const loadedSales = dbSales.map(mapSaleFromDB);
+
+                // Ordenar por fecha descendente
+                loadedSales.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+                setSales(loadedSales);
+
+                // Generar Remitos desde las Ventas cargadas
+                const generatedDeliveryNotes: DeliveryNote[] = loadedSales.map(s => ({
+                    id: s.id,
+                    noteNumber: s.saleNumber.replace('V', 'R'),
+                    saleId: s.id,
+                    customerId: s.customerId,
+                    customerName: s.customerName,
+                    customerAddress: s.customerAddress,
+                    items: s.items,
+                    total: s.total,
+                    deliveryType: s.paymentStatus === 'pending' ? 'pending' : 'paid',
+                    date: s.date,
+                    notes: s.notes
+                }));
+                setDeliveryNotes(generatedDeliveryNotes);
+
                 setStockMovements(dbMovements);
                 setUsers(dbUsers); // Si no hay en DB, usamos memoria pero NO guardamos en DB automático para no ensuciar
 
