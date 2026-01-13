@@ -275,125 +275,60 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                     <div className="modal-body" style={{ flex: 1, overflowY: 'auto' }}>
 
                         {/* CONFIGURACIÓN MONEDA Y COTIZACIÓN (Movido aquí para mejor UI Mobile) */}
-                        <div style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            alignItems: 'center',
-                            gap: '15px',
-                            marginBottom: 'var(--spacing-lg)',
-                            padding: '12px',
-                            backgroundColor: 'rgba(0,0,0,0.03)',
-                            borderRadius: '8px',
-                            border: '1px solid var(--color-border-light)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                <label style={{ fontSize: '0.9rem', color: '#666' }}>Moneda:</label>
-                                <select
-                                    className="select"
-                                    style={{ width: 'auto', padding: '4px 8px', fontSize: '0.9rem' }}
-                                    value={saleCurrency}
-                                    onChange={(e) => {
-                                        if (items.length > 0) {
-                                            if (confirm('Cambiar la moneda recalculará los precios del carrito. ¿Continuar?')) {
-                                                setSaleCurrency(e.target.value as Currency);
-                                                // TODO: Recalcular items si cambio la moneda
-                                                setItems([]);
-                                            }
-                                        } else {
-                                            setSaleCurrency(e.target.value as Currency);
-                                        }
-                                    }}
-                                >
-                                    <option value="ARS">ARS ($)</option>
-                                    <option value="USD">USD (U$D)</option>
-                                </select>
-                            </div>
+                        {/* CABECERA ULTRA COMPACTA: Moneda + Cotización */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', background: 'var(--color-surface)', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '0.5rem' }}>
+                            <select
+                                className="select"
+                                style={{ width: 'auto', padding: '2px 8px', fontSize: '0.85rem', height: '30px', minHeight: 'unset' }}
+                                value={saleCurrency}
+                                onChange={(e) => {
+                                    if (items.length > 0 && confirm('Cambiar moneda recalculará todo. ¿Seguir?')) {
+                                        setSaleCurrency(e.target.value as Currency);
+                                        setItems([]);
+                                    } else if (items.length === 0) setSaleCurrency(e.target.value as Currency);
+                                }}
+                            >
+                                <option value="ARS">ARS ($)</option>
+                                <option value="USD">USD (U$D)</option>
+                            </select>
 
                             {saleCurrency === 'ARS' && (
-                                <div style={{ fontSize: '0.9rem', color: '#666', display: 'flex', alignItems: 'center' }}>
-                                    Cotización USD:
+                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     {isEditingRate ? (
-                                        <div style={{ display: 'flex', alignItems: 'center', marginLeft: '5px' }}>
-                                            <span style={{ marginRight: '2px' }}>$</span>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
                                             <input
                                                 type="number"
                                                 value={customRate}
                                                 onChange={(e) => setCustomRate(e.target.value)}
-                                                style={{
-                                                    width: '70px',
-                                                    padding: '2px 4px',
-                                                    border: '1px solid var(--primary-color)',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.9rem'
-                                                }}
+                                                style={{ width: '60px', padding: '2px', fontSize: '0.85rem', height: '28px' }}
                                                 autoFocus
                                             />
-                                            <button
-                                                type="button"
-                                                onClick={handleUpdateRate}
-                                                className="btn-icon"
-                                                style={{ marginLeft: '4px', color: 'green' }}
-                                                title="Guardar"
-                                            >
-                                                <Check size={16} />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsEditingRate(false)}
-                                                className="btn-icon"
-                                                style={{ marginLeft: '2px', color: 'red' }}
-                                                title="Cancelar"
-                                            >
-                                                <X size={16} />
-                                            </button>
+                                            <button onClick={handleUpdateRate} className="btn-icon" style={{ color: 'var(--color-success)', marginLeft: '4px' }}><Check size={16} /></button>
+                                            <button onClick={() => setIsEditingRate(false)} className="btn-icon" style={{ color: 'var(--color-error)', marginLeft: '2px' }}><X size={16} /></button>
                                         </div>
                                     ) : (
                                         <>
-                                            <span style={{ fontWeight: 'bold', marginLeft: '4px' }}>
-                                                ${activeRate ? activeRate.rate : '---'}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setCustomRate(activeRate ? activeRate.rate.toString() : '');
-                                                    setIsEditingRate(true);
-                                                }}
-                                                className="btn-icon"
-                                                style={{ marginLeft: '4px', color: '#666', cursor: 'pointer' }}
-                                                title="Editar cotización"
-                                            >
-                                                <Pencil size={14} />
-                                            </button>
+                                            <span>USD: <strong style={{ color: 'var(--color-text)' }}>${activeRate ? activeRate.rate : '---'}</strong></span>
+                                            <button onClick={() => { setCustomRate(activeRate?.rate.toString() || ''); setIsEditingRate(true); }} className="btn-icon" style={{ color: 'var(--color-text-muted)' }}><Pencil size={12} /></button>
                                         </>
                                     )}
-                                    <a
-                                        href={EXCHANGE_RATE_URL}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{ marginLeft: '8px', fontSize: '0.8rem', color: 'var(--primary-color)' }}
-                                    >
-                                        (DolarHoy)
-                                    </a>
                                 </div>
                             )}
                         </div>
 
-                        {/* SECCIÓN CLIENTE COMPACTA */}
-                        <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+                        {/* CLIENTE ULTRA COMPACTO */}
+                        <div style={{ marginBottom: '0.5rem' }}>
+                            <div style={{ display: 'flex', gap: '5px', alignItems: 'flex-end' }}>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                        <label className="form-label" style={{ margin: 0 }}>Cliente</label>
-                                        {!customerId && <span style={{ fontSize: '0.75rem', color: 'var(--color-warning)' }}>* Obligatorio</span>}
-                                    </div>
+                                    {!customerId && <label style={{ fontSize: '0.7rem', color: 'var(--color-warning)', marginBottom: '2px', display: 'block', fontWeight: 600 }}>* CLIENTE REQUERIDO</label>}
                                     <select
                                         className="select"
                                         value={customerId}
                                         onChange={e => setCustomerId(e.target.value)}
                                         required
-                                        style={{ width: '100%' }}
+                                        style={{ width: '100%', height: '36px', padding: '0 8px', fontSize: '0.9rem' }}
                                     >
-                                        <option value="">-- Seleccionar --</option>
+                                        <option value="">Seleccionar Cliente...</option>
                                         {customers.map(customer => (
                                             <option key={customer.id} value={customer.id}>
                                                 {customer.name} {customer.lastName}
@@ -404,110 +339,97 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                                 <button
                                     type="button"
                                     className="btn btn-secondary"
-                                    style={{ padding: '0.6rem', height: '42px' }}
+                                    style={{ padding: '0', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                     onClick={() => setShowCustomerModal(true)}
-                                    title="Nuevo Cliente"
+                                    title="Nuevo"
                                 >
-                                    <UserPlus size={20} />
+                                    <UserPlus size={18} />
                                 </button>
                             </div>
 
-                            {/* ALERTA DE DEUDA (Mantenida igual pero con margen reducido) */}
                             {hasPendingDebt && (
-                                <div style={{
-                                    marginTop: '8px',
-                                    padding: '8px 12px',
-                                    backgroundColor: '#fff3cd',
-                                    border: '1px solid #ffc107',
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    <AlertCircle size={18} color="#856404" />
-                                    <div style={{ color: '#856404' }}>
-                                        Deuda pendiente: <strong>${customerDebt.toFixed(2)}</strong>
-                                    </div>
+                                <div style={{ marginTop: '4px', padding: '4px 8px', backgroundColor: '#fff3cd', border: '1px solid #ffc107', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#856404' }}>
+                                    <AlertCircle size={14} /> <span>Deuda: <strong>${customerDebt.toFixed(2)}</strong></span>
                                 </div>
                             )}
                         </div>
 
-                        {/* SECCIÓN PRODUCTOS */}
-                        <div className="form-group">
-                            <label className="form-label">Productos</label>
-                            <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-md)', flexWrap: 'wrap' }}>
+                        {/* SECCIÓN PRODUCTOS ULTRA COMPACTA */}
+                        <div style={{ marginBottom: '0.5rem' }}>
+                            <div style={{ display: 'flex', gap: '4px', marginBottom: '4px', alignItems: 'stretch' }}>
                                 <button
                                     type="button"
                                     className="btn btn-secondary"
                                     onClick={() => setShowQRScanner(true)}
-                                    style={{ flex: 1, minWidth: '120px' }}
+                                    style={{ padding: 0, width: '40px', flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    title="Scan QR"
                                 >
-                                    <QrCode size={18} /> Scannear (Cam)
+                                    <QrCode size={20} />
                                 </button>
 
-                                <div style={{ flex: 2, display: 'flex', gap: 'var(--spacing-sm)', minWidth: '200px' }}>
-                                    <select
-                                        className="select"
-                                        value={selectedProductId}
-                                        onChange={e => setSelectedProductId(e.target.value)}
-                                        style={{ flex: 1 }}
-                                    >
-                                        <option value="">Buscar producto...</option>
-                                        {products
-                                            .filter(p => p.status === 'in_stock' && p.stock > 0)
-                                            .map(product => (
-                                                <option key={product.id} value={product.id}>
-                                                    {product.code} - {product.name} ({product.color}) - ${product.price}
-                                                </option>
-                                            ))}
-                                    </select>
-                                    <input
-                                        ref={quantityInputRef}
-                                        type="number"
-                                        className="input"
-                                        placeholder="#"
-                                        value={quantity}
-                                        onChange={e => setQuantity(e.target.value)}
-                                        min="0.1"
-                                        step="any"
-                                        style={{ width: '80px' }}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="btn btn-primary"
-                                        onClick={handleAddItem}
-                                        disabled={!selectedProductId}
-                                    >
-                                        <Plus size={18} />
-                                    </button>
-                                </div>
+                                <select
+                                    className="select"
+                                    value={selectedProductId}
+                                    onChange={e => setSelectedProductId(e.target.value)}
+                                    style={{ flex: 1, padding: '0 6px', fontSize: '0.85rem', height: 'auto', minHeight: '36px', width: '0' }} // width 0 para flex shrink
+                                >
+                                    <option value="">Buscar prod...</option>
+                                    {products
+                                        .filter(p => p.status === 'in_stock' && p.stock > 0)
+                                        .map(p => (
+                                            <option key={p.id} value={p.id}>{p.name} - ${p.price}</option>
+                                        ))}
+                                </select>
+
+                                <input
+                                    ref={quantityInputRef}
+                                    type="number"
+                                    className="input"
+                                    placeholder="#"
+                                    value={quantity}
+                                    onChange={e => setQuantity(e.target.value)}
+                                    style={{ width: '40px', textAlign: 'center', padding: '0', height: 'auto' }}
+                                    min="0.1"
+                                    step="any"
+                                />
+
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={handleAddItem}
+                                    disabled={!selectedProductId}
+                                    style={{ padding: 0, width: '40px', flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                >
+                                    <Plus size={22} />
+                                </button>
                             </div>
 
-                            {/* LISTA DE ITEMS */}
-                            <div className="table-container" style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                                <table className="table">
-                                    <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                            {/* LISTA DE ITEMS COMPACTA */}
+                            <div className="table-container" style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid var(--color-border-light)', borderRadius: '4px' }}>
+                                <table className="table" style={{ fontSize: '0.85rem', marginBottom: 0 }}>
+                                    <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-surface)' }}>
                                         <tr>
-                                            <th>Producto</th>
-                                            <th style={{ textAlign: 'center' }}>Cant.</th>
-                                            <th style={{ textAlign: 'right' }}>Precio</th>
-                                            <th style={{ textAlign: 'right' }}>Subtotal</th>
-                                            <th></th>
+                                            <th style={{ padding: '6px 4px' }}>Prod.</th>
+                                            <th style={{ padding: '6px 4px', textAlign: 'center', width: '40px' }}>Cnt</th>
+                                            <th style={{ padding: '6px 4px', textAlign: 'right' }}>Total</th>
+                                            <th style={{ padding: '6px 4px', width: '30px' }}></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {items.map(item => (
                                             <tr key={item.productId}>
-                                                <td>{item.productName}</td>
-                                                <td style={{ textAlign: 'center' }}>{item.quantity}</td>
-                                                <td style={{ textAlign: 'right' }}>${item.unitPrice.toFixed(2)}</td>
-                                                <td style={{ textAlign: 'right', fontWeight: 'bold' }}>${item.subtotal.toFixed(2)}</td>
-                                                <td style={{ textAlign: 'right' }}>
+                                                <td style={{ padding: '4px', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {item.productName}
+                                                    <div style={{ fontSize: '0.75em', color: 'var(--color-text-muted)' }}>${item.unitPrice}</div>
+                                                </td>
+                                                <td style={{ padding: '4px', textAlign: 'center' }}>{item.quantity}</td>
+                                                <td style={{ padding: '4px', textAlign: 'right', fontWeight: 'bold' }}>${item.subtotal.toFixed(0)}</td>
+                                                <td style={{ padding: '4px', textAlign: 'right' }}>
                                                     <button
                                                         type="button"
                                                         className="btn-icon btn-icon-danger"
                                                         onClick={() => handleRemoveItem(item.productId)}
+                                                        style={{ padding: '2px' }}
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
@@ -516,8 +438,8 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                                         ))}
                                         {items.length === 0 && (
                                             <tr>
-                                                <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', opacity: 0.5 }}>
-                                                    No hay productos agregados
+                                                <td colSpan={4} style={{ textAlign: 'center', padding: '1.5rem 0.5rem', opacity: 0.5, fontSize: '0.8rem' }}>
+                                                    Sin productos
                                                 </td>
                                             </tr>
                                         )}
