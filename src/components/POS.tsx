@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ShoppingCart, Package, Users, QrCode } from 'lucide-react';
+import { ShoppingCart, QrCode } from 'lucide-react';
 import SaleModal from './SaleModal';
 import QRScannerModal from './QRScannerModal';
 import ProductInfoModal from './ProductInfoModal';
@@ -52,26 +52,7 @@ const POS: React.FC = () => {
                     <p>Buscar producto y ver stock/precio</p>
                 </button>
 
-                {/* Accesos rápidos que podrían redirigir o abrir modales */}
-                <div className="pos-stat-card">
-                    <div className="stat-icon bg-info">
-                        <Package size={24} />
-                    </div>
-                    <div className="stat-content">
-                        <h4>Stock Bajo</h4>
-                        <p className="stat-value">Revisar Alertas</p>
-                    </div>
-                </div>
 
-                <div className="pos-stat-card">
-                    <div className="stat-icon bg-success">
-                        <Users size={24} />
-                    </div>
-                    <div className="stat-content">
-                        <h4>Clientes</h4>
-                        <p className="stat-value">Gestión Rápida</p>
-                    </div>
-                </div>
             </div>
 
             <div className="pos-recent-section">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { LayoutGrid, Package, TrendingUp, Users, FileText, Receipt, BarChart3, LogOut, ShoppingCart, DollarSign, Settings, ShieldCheck, Menu, X } from 'lucide-react';
+import { LayoutGrid, Package, TrendingUp, Users, FileText, Receipt, BarChart3, LogOut, ShoppingCart, DollarSign, Settings, Menu, X } from 'lucide-react';
 import { COMPANY_INFO } from '../config/company';
 import type { ViewType, User } from '../types';
 import './Layout.css';
@@ -40,7 +40,6 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
     });
 
     const adminItems = [
-        { id: 'admin', label: 'Usuarios', icon: <ShieldCheck size={20} /> },
         { id: 'settings', label: 'Configuración', icon: <Settings size={20} /> },
     ];
 
