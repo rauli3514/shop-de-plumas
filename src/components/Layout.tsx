@@ -21,7 +21,8 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
     };
 
     // Menú dinámico según rol
-    const menuItems = [
+    // Menú dinámico según rol
+    const allMenuItems = [
         { id: 'pos', label: 'Punto de Venta', icon: <ShoppingCart size={20} /> },
         { id: 'dashboard', label: 'Dashboard', icon: <LayoutGrid size={20} /> },
         { id: 'products', label: 'Productos', icon: <Package size={20} /> },
@@ -29,9 +30,14 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
         { id: 'customers', label: 'Clientes', icon: <Users size={20} /> },
         { id: 'sales', label: 'Historial Ventas', icon: <Receipt size={20} /> },
         { id: 'delivery-notes', label: 'Remitos', icon: <FileText size={20} /> },
-        { id: 'accounts-receivable', label: 'Cuentas Corrientes', icon: <DollarSign size={20} /> },
-        { id: 'reports', label: 'Reportes', icon: <BarChart3 size={20} /> },
+        { id: 'accounts-receivable', label: 'Cuentas Corrientes', icon: <DollarSign size={20} />, restricted: true },
+        { id: 'reports', label: 'Reportes', icon: <BarChart3 size={20} />, restricted: true },
     ];
+
+    const menuItems = allMenuItems.filter(item => {
+        if (currentUser.role === 'owner') return true;
+        return !item.restricted;
+    });
 
     const adminItems = [
         { id: 'admin', label: 'Usuarios', icon: <ShieldCheck size={20} /> },
