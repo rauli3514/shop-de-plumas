@@ -239,6 +239,21 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
             const { sale, deliveryNote } = result;
             generateSalePDF(sale);
             generateDeliveryNotePDF(deliveryNote);
+
+            // Alerta de Stock Bajo
+            const lowStockWarnings: string[] = [];
+            items.forEach(item => {
+                const prod = products.find(p => p.id === item.productId);
+                // Calculamos el stock resultante estimado (prod.stock actual incluye el item si no se ha actualizado reactivamente aún,
+                // pero addSale es async. Asumimos prod.stock es el valor ANTES de la venta en este render cycle)
+                if (prod && (prod.stock - item.quantity) <= (prod.minStock || 0)) {
+                    lowStockWarnings.push(`${prod.name} (Quedan: ${prod.stock - item.quantity})`);
+                }
+            });
+
+            if (lowStockWarnings.length > 0) {
+                alert(`⚠️ ALERTA DE STOCK BAJO:\n\nLos siguientes productos han alcanzado el nivel mínimo:\n\n• ${lowStockWarnings.join('\n• ')}`);
+            }
         }
 
         onClose();

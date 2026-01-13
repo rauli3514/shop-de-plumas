@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { X } from 'lucide-react';
 import type { Product, ProductStatus, Currency } from '../types';
+import { formatCurrency } from '../utils/currency';
 
 interface ProductModalProps {
     product: Product | null;
@@ -28,10 +29,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
             setColor(product.color);
             setCategory(product.category || '');
             setDescription(product.description || '');
-            setCost(product.cost.toString());
-            setPrice(product.price.toString());
-            setStock(product.stock.toString());
-            setMinStock(product.minStock.toString());
+            setCost((product.cost ?? 0).toString());
+            setPrice((product.price ?? 0).toString());
+            setStock((product.stock ?? 0).toString());
+            setMinStock((product.minStock ?? 0).toString());
             setSupplier(product.supplier || ''); // fix si supplier era opcional o string
             setStatus(product.status || 'in_stock');
             setCurrency(product.currency);
@@ -58,10 +59,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
             color,
             category,
             description,
-            cost: parseFloat(cost),
-            price: parseFloat(price),
-            stock: parseInt(stock),
-            minStock: parseInt(minStock),
+            cost: parseFloat(cost) || 0,
+            price: parseFloat(price) || 0,
+            stock: parseInt(stock) || 0,
+            minStock: parseInt(minStock) || 0,
             supplier,
             status,
             currency,
@@ -167,7 +168,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
 
                         {/* Info de ganancia (Feedback visual rápido) */}
                         <div style={{ marginBottom: '1rem', fontSize: '0.85rem', color: '#666', textAlign: 'right' }}>
-                            Ganancia estimada: <strong>{currency === 'USD' ? 'U$D' : '$'}{(parseFloat(price || '0') - parseFloat(cost || '0')).toFixed(2)}</strong>
+                            Ganancia estimada: <strong>{formatCurrency((parseFloat(price || '0') - parseFloat(cost || '0')), currency)}</strong>
                             {' '}
                             ({price && cost ? (((parseFloat(price) - parseFloat(cost)) / parseFloat(cost)) * 100).toFixed(0) : 0}%)
                         </div>
