@@ -126,7 +126,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 const dbMovements = smRes.data || [];
 
                 setProducts(dbProducts);
-                setCustomers(dbCustomers);
+                // Mapear clientes de snake_case (DB) a camelCase (App)
+                const mapCustomerFromDB = (c: any): Customer => ({
+                    id: c.id,
+                    name: c.name,
+                    lastName: c.last_name || c.lastName || '',
+                    phone: c.phone || '',
+                    email: c.email || '',
+                    address: c.address || '',
+                    city: c.city || '',
+                    province: c.province || '',
+                    notes: c.notes || '',
+                    createdAt: new Date(c.created_at || c.createdAt || new Date()),
+                    updatedAt: new Date(c.updated_at || c.updatedAt || new Date()),
+                });
+
+                setCustomers(dbCustomers.map(mapCustomerFromDB));
                 setSales(dbSales);
                 setStockMovements(dbMovements);
                 setUsers(dbUsers); // Si no hay en DB, usamos memoria pero NO guardamos en DB automático para no ensuciar
@@ -233,17 +248,49 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     const addCustomer = async (data: any) => {
-        const newCustomer = { ...data, id: crypto.randomUUID(), created_at: new Date() };
+        const newCustomer = { ...data, id: crypto.randomUUID(), createdAt: new Date(), updatedAt: new Date() };
+        // Optimistic update
         setCustomers(prev => [...prev, newCustomer]);
 
-        const { error } = await supabase.from('customers').insert(newCustomer);
-        if (error) console.error(error);
+        // DB Payload (snake_case)
+        const dbPayload = {
+            id: newCustomer.id,
+            name: newCustomer.name,
+            last_name: newCustomer.lastName,
+            phone: newCustomer.phone,
+            email: newCustomer.email,
+            address: newCustomer.address,
+            city: newCustomer.city,
+            province: newCustomer.province,
+            notes: newCustomer.notes,
+            created_at: newCustomer.createdAt,
+            updated_at: newCustomer.updatedAt
+        };
+
+        const { error } = await supabase.from('customers').insert(dbPayload);
+        if (error) {
+            console.error("Error creating customer:", error);
+            alert(`Error creando cliente en nube: ${error.message}`);
+        }
         return newCustomer;
     };
 
     const updateCustomer = async (id: string, updates: any) => {
         setCustomers(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
-        await supabase.from('customers').update(updates).eq('id', id);
+
+        // Mapear updates a snake_case
+        const dbUpdates: any = {};
+        if (updates.name !== undefined) dbUpdates.name = updates.name;
+        if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName;
+        if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
+        if (updates.email !== undefined) dbUpdates.email = updates.email;
+        if (updates.address !== undefined) dbUpdates.address = updates.address;
+        if (updates.city !== undefined) dbUpdates.city = updates.city;
+        if (updates.province !== undefined) dbUpdates.province = updates.province;
+        if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+        dbUpdates.updated_at = new Date();
+
+        await supabase.from('customers').update(dbUpdates).eq('id', id);
     };
 
     const deleteCustomer = async (id: string) => {
