@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { X, Plus, Trash2, QrCode, UserPlus, AlertCircle, Check, Pencil } from 'lucide-react';
 import type { SaleItem, Currency } from '../types';
 import { generateSalePDF, generateDeliveryNotePDF } from '../utils/pdfGenerator';
-import { convertCurrency, EXCHANGE_RATE_URL } from '../utils/currency';
+import { convertCurrency } from '../utils/currency';
 import QRScannerModal from './QRScannerModal';
 import CustomerModal from './CustomerModal';
 import '../components/common.css';
