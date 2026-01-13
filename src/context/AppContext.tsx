@@ -144,33 +144,39 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 setCustomers(dbCustomers.map(mapCustomerFromDB));
 
                 // Mapear Ventas snake_case -> camelCase
-                const mapSaleFromDB = (s: any): Sale => ({
-                    id: s.id,
-                    saleNumber: typeof s.sale_number === 'number' ? `V${String(s.sale_number).padStart(6, '0')}` : (s.sale_number || s.saleNumber || 'V---'),
-                    customerId: s.customer_id,
-                    customerName: s.customer_name || 'Cliente Final',
-                    customerAddress: '',
-                    items: s.items || [],
-                    subtotal: s.subtotal || 0,
-                    total: s.total || 0,
-                    currency: s.currency || 'ARS',
-                    payment: {
-                        methodId: 'db',
-                        methodName: s.payment_method || 'Varios',
+                const mapSaleFromDB = (s: any): Sale => {
+                    // Intentar recuperar nombre de usuario si falta
+                    const sellerObj = Array.isArray(dbUsers) ? dbUsers.find((u: any) => u.id === s.user_id) : null;
+                    const finalUserName = s.user_name || (sellerObj ? sellerObj.name : 'Desconocido');
+
+                    return {
+                        id: s.id,
+                        saleNumber: typeof s.sale_number === 'number' ? `V${String(s.sale_number).padStart(6, '0')}` : (s.sale_number || s.saleNumber || 'V---'),
+                        customerId: s.customer_id,
+                        customerName: s.customer_name || 'Cliente Final',
+                        customerAddress: '',
+                        items: s.items || [],
                         subtotal: s.subtotal || 0,
-                        surcharge: s.surcharge || 0,
-                        total: s.total || 0
-                    },
-                    paymentStatus: s.payment_status || 'paid',
-                    amountPaid: s.amount_paid || 0,
-                    balance: s.balance || 0,
-                    totalCost: s.total_cost || 0,
-                    totalProfit: s.total_profit || 0,
-                    date: new Date(s.date || s.created_at),
-                    notes: s.notes,
-                    userId: s.user_id,
-                    userName: s.user_name
-                });
+                        total: s.total || 0,
+                        currency: s.currency || 'ARS',
+                        payment: {
+                            methodId: 'db',
+                            methodName: s.payment_method || 'Varios',
+                            subtotal: s.subtotal || 0,
+                            surcharge: s.surcharge || 0,
+                            total: s.total || 0
+                        },
+                        paymentStatus: s.payment_status || 'paid',
+                        amountPaid: s.amount_paid || 0,
+                        balance: s.balance || 0,
+                        totalCost: s.total_cost || 0,
+                        totalProfit: s.total_profit || 0,
+                        date: new Date(s.date || s.created_at),
+                        notes: s.notes,
+                        userId: s.user_id,
+                        userName: finalUserName
+                    };
+                };
 
                 const loadedSales = dbSales.map(mapSaleFromDB);
 
@@ -379,17 +385,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         // Mapear campos camelCase a snake_case DB
         const dbSale = {
             id: newSale.id,
-            // sale_number: 0, // REMOVIDO: Dejar que DB autogenere el serial
+            // sale_number autogenerado
             customer_id: newSale.customerId,
             customer_name: newSale.customerName,
             subtotal: newSale.subtotal,
             total: newSale.total,
-            items: newSale.items, // JSON array
+            total_cost: newSale.totalCost, // Nuevo
+            total_profit: newSale.totalProfit, // Nuevo
+            items: newSale.items,
             payment_status: newSale.paymentStatus,
             amount_paid: newSale.amountPaid,
             balance: newSale.balance,
             currency: newSale.currency,
             notes: newSale.notes,
+            user_id: newSale.userId, // Nuevo
+            user_name: newSale.userName, // Nuevo
             created_at: new Date()
         };
 
