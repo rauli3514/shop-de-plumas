@@ -76,6 +76,8 @@ const Products: React.FC = () => {
                             <th>Código</th>
                             <th>Nombre</th>
                             <th>Color</th>
+                            <th>Medida</th>
+                            <th>Estado</th>
                             <th>Precio Venta</th>
                             {isOwner && <th>Costo</th>}
                             <th>Stock</th>
@@ -88,6 +90,12 @@ const Products: React.FC = () => {
                                 <td className="font-mono">{product.code}</td>
                                 <td>{product.name}</td>
                                 <td>{product.color}</td>
+                                <td>{product.size || '-'}</td>
+                                <td>
+                                    {product.status === 'in_stock' && <span className="badge badge-success">En Stock</span>}
+                                    {product.status === 'incoming' && <span className="badge badge-warning">En Camino</span>}
+                                    {product.status === 'reserved' && <span className="badge badge-info">Reservado</span>}
+                                </td>
                                 <td className="font-bold">${product.price}</td>
                                 {isOwner && <td>${product.cost}</td>}
                                 <td className={product.stock <= product.minStock ? 'text-error font-bold' : ''}>

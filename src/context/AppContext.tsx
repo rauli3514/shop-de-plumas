@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { Product, Customer, Sale, StockMovement, DeliveryNote, User, PaymentMethodConfig, ExchangeRate, Currency } from '../types';
+import type { Product, Customer, Sale, StockMovement, DeliveryNote, User, PaymentMethodConfig, ExchangeRate, Currency, Expense } from '../types';
 import { supabase } from '../lib/supabase';
 
 interface AppContextType {
@@ -41,9 +41,13 @@ interface AppContextType {
     updateUser: (id: string, user: Partial<User>) => Promise<void>;
     deleteUser: (id: string) => Promise<void>;
 
-    // Tipos de Cambio
     addExchangeRate: (rate: Omit<ExchangeRate, 'id' | 'date'>) => Promise<void>;
     getActiveExchangeRate: (fromCurrency: Currency, toCurrency: Currency) => ExchangeRate | null;
+
+    // Gastos
+    expenses: Expense[];
+    addExpense: (expense: Omit<Expense, 'id'>) => Promise<void>;
+    deleteExpense: (id: string) => Promise<void>;
 
     // Consultas
     getProductById: (id: string) => Product | undefined;
@@ -67,6 +71,7 @@ const STORAGE_KEYS = {
     EXCHANGE_RATES: 'shop-plumas-exchange-rates',
     USERS: 'shop-plumas-users',
     CURRENT_USER: 'shop-plumas-current-user',
+    EXPENSES: 'shop-plumas-expenses',
 };
 
 // Usuarios por defecto (Fallback)
@@ -91,6 +96,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const [users, setUsers] = useState<User[]>([]);
     const [exchangeRates, setExchangeRates] = useState<ExchangeRate[]>([]);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Carga inicial
@@ -106,13 +112,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 if (storedUser) setCurrentUser(JSON.parse(storedUser));
 
                 // 2. Intentar cargar de Supabase
-                const [pRes, cRes, sRes, uRes, erRes, smRes] = await Promise.all([
+                const [pRes, cRes, sRes, uRes, erRes, smRes, exRes] = await Promise.all([
                     supabase.from('products').select('*'),
                     supabase.from('customers').select('*'),
                     supabase.from('sales').select('*'),
                     supabase.from('users').select('*'), // Asumiendo tabla users creada manualmente o en schema
                     supabase.from('exchange_rates').select('*'),
-                    supabase.from('stock_movements').select('*')
+                    supabase.from('stock_movements').select('*'),
+                    supabase.from('expenses').select('*')
                 ]);
 
                 // Si hay error de red, usar LocalStorage (Modo Offline)
@@ -124,6 +131,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 const dbUsers = uRes.data && uRes.data.length > 0 ? uRes.data : DEFAULT_USERS; // Si no hay users en DB, usar default
                 const dbRates = erRes.data || [];
                 const dbMovements = smRes.data || [];
+                const dbExpenses = exRes.data || [];
+                // NO, pRes es el PRIMER elemento. Promise.all retorna array.
+                // Necesito cambiar el destructuring en la linea 109.
+                // Como tool call reemplaza bloque, necesito asegurar que coincida.
+                // Reemplazaré el bloque de initData completo o al menos la parte de promise.all y destructuring.
+
 
                 setProducts(dbProducts);
                 // Mapear clientes de snake_case (DB) a camelCase (App)
@@ -136,6 +149,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                     address: c.address || '',
                     city: c.city || '',
                     province: c.province || '',
+                    cuil: c.cuit || '', // Map DB cuit to App cuil
                     notes: c.notes || '',
                     createdAt: new Date(c.created_at || c.createdAt || new Date()),
                     updatedAt: new Date(c.updated_at || c.updatedAt || new Date()),
@@ -216,6 +230,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 setStockMovements(dbMovements.map(mapMovementFromDB));
                 setUsers(dbUsers); // Si no hay en DB, usamos memoria pero NO guardamos en DB automático para no ensuciar
 
+                // Map Expenses
+                setExpenses(dbExpenses.map((e: any) => ({
+                    id: e.id,
+                    description: e.description,
+                    amount: Number(e.amount),
+                    category: e.category,
+                    notes: e.notes || '',
+                    date: new Date(e.date || e.created_at),
+                    userId: e.user_id
+                })));
+
+
                 // Tipos de cambio: Si vacío, crear default
                 if (dbRates.length === 0) {
                     const initialRate = {
@@ -263,6 +289,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 setCustomers(load(STORAGE_KEYS.CUSTOMERS));
                 setSales(load(STORAGE_KEYS.SALES));
                 setUsers(load(STORAGE_KEYS.USERS).length ? load(STORAGE_KEYS.USERS) : DEFAULT_USERS);
+                setExpenses(load(STORAGE_KEYS.EXPENSES));
             } finally {
                 setIsLoading(false);
             }
@@ -332,6 +359,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             address: newCustomer.address,
             city: newCustomer.city,
             province: newCustomer.province,
+            cuit: newCustomer.cuil, // Data App cuil -> DB cuit
             notes: newCustomer.notes,
             created_at: newCustomer.createdAt,
             updated_at: newCustomer.updatedAt
@@ -357,6 +385,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (updates.address !== undefined) dbUpdates.address = updates.address;
         if (updates.city !== undefined) dbUpdates.city = updates.city;
         if (updates.province !== undefined) dbUpdates.province = updates.province;
+        if (updates.cuil !== undefined) dbUpdates.cuit = updates.cuil; // App cuil -> DB cuit
         if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
         dbUpdates.updated_at = new Date();
 
@@ -388,6 +417,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             // sale_number autogenerado
             customer_id: newSale.customerId,
             customer_name: newSale.customerName,
+            buyer_cuil: newSale.buyerCuil, // Nuevo
             subtotal: newSale.subtotal,
             total: newSale.total,
             total_cost: newSale.totalCost, // Nuevo
@@ -541,14 +571,47 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
     const logout = () => { setCurrentUser(null); localStorage.removeItem(STORAGE_KEYS.CURRENT_USER); };
 
+    const addExpense = async (expenseData: any) => {
+        const newExpense = {
+            ...expenseData,
+            id: crypto.randomUUID(),
+            date: new Date(),
+            userId: currentUser?.id
+        };
+        setExpenses(prev => [newExpense, ...prev]);
+
+        // DB Mapping snake_case
+        const dbExpense = {
+            id: newExpense.id,
+            description: newExpense.description,
+            amount: newExpense.amount,
+            category: newExpense.category,
+            notes: newExpense.notes,
+            user_id: newExpense.userId,
+            created_at: new Date()
+        };
+
+        const { error } = await supabase.from('expenses').insert(dbExpense);
+        if (error) {
+            console.error("Error creating expense:", error);
+            // alert?
+        }
+    };
+
+    const deleteExpense = async (id: string) => {
+        setExpenses(prev => prev.filter(e => e.id !== id));
+        await supabase.from('expenses').delete().eq('id', id);
+    };
+
     const value = {
-        products, customers, sales, stockMovements, deliveryNotes, paymentMethods, exchangeRates, users, currentUser, isLoading,
+        products, customers, sales, stockMovements, deliveryNotes, paymentMethods, exchangeRates, users, currentUser, expenses, isLoading,
         addProduct, updateProduct, deleteProduct,
         addCustomer, updateCustomer, deleteCustomer,
         addSale, registerPayment,
         addStockMovement, addPaymentMethod, updatePaymentMethod, deletePaymentMethod,
         addUser, updateUser, deleteUser,
         addExchangeRate, getActiveExchangeRate,
+        addExpense, deleteExpense,
         getProductById, getCustomerById, getSalesByCustomer,
         login, logout
     };

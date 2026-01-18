@@ -19,6 +19,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
     const [province, setProvince] = useState('');
+    const [cuit, setCuit] = useState(''); // Estado local para cuil/cuit
     const [notes, setNotes] = useState('');
 
     useEffect(() => {
@@ -30,6 +31,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
             setAddress(customer.address || '');
             setCity(customer.city || '');
             setProvince(customer.province || '');
+            setCuit(customer.cuil || '');
             setNotes(customer.notes || '');
         } else {
             setName('');
@@ -39,6 +41,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
             setAddress('');
             setCity('');
             setProvince('');
+            setCuit('');
             setNotes('');
         }
     }, [customer]);
@@ -54,6 +57,7 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
             address,
             city,
             province,
+            cuil: cuit,
             notes
         };
 
@@ -163,6 +167,17 @@ const CustomerModal: React.FC<CustomerModalProps> = ({ customer, onClose, onCust
                                     onChange={e => setProvince(e.target.value)}
                                 />
                             </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">CUIL/CUIT</label>
+                            <input
+                                type="text"
+                                className="input"
+                                placeholder="CUIL/CUIT"
+                                value={cuit}
+                                onChange={e => setCuit(e.target.value)}
+                            />
                         </div>
 
                         <div className="form-group">

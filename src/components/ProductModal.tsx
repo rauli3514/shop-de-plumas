@@ -13,6 +13,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
     const { addProduct, updateProduct } = useApp();
     const [name, setName] = useState('');
     const [color, setColor] = useState('');
+    const [size, setSize] = useState('');
     const [category, setCategory] = useState('');
     const [description, setDescription] = useState('');
     const [cost, setCost] = useState('');
@@ -27,6 +28,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
         if (product) {
             setName(product.name);
             setColor(product.color);
+            setSize(product.size || '');
             setCategory(product.category || '');
             setDescription(product.description || '');
             setCost((product.cost ?? 0).toString());
@@ -39,6 +41,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
         } else {
             setName('');
             setColor('');
+            setSize('');
             setCategory('');
             setDescription('');
             setCost('');
@@ -57,6 +60,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
         const productData = {
             name,
             color,
+            size,
             category,
             description,
             cost: parseFloat(cost) || 0,
@@ -103,7 +107,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                             />
                         </div>
 
-                        <div className="form-grid-2">
+                        <div className="form-grid-3">
                             <div className="form-group">
                                 <label className="form-label">Color / Variante</label>
                                 <input
@@ -113,6 +117,16 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
                                     onChange={e => setColor(e.target.value)}
                                     required
                                     placeholder="Ej: Rojo Intenso"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Medida</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={size}
+                                    onChange={e => setSize(e.target.value)}
+                                    placeholder="Ej: 50cm"
                                 />
                             </div>
                             <div className="form-group">

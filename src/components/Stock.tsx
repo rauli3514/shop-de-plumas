@@ -8,7 +8,7 @@ const Stock: React.FC = () => {
     const { products, stockMovements, currentUser, users } = useApp();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'all' | 'in_stock' | 'incoming'>('all');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'in_stock' | 'incoming' | 'reserved'>('all');
 
     // Calcular totales inline (Solo visible para admin)
     const totalValue = products.reduce((sum, p) => sum + (p.stock * p.cost), 0);
@@ -72,6 +72,7 @@ const Stock: React.FC = () => {
                             <option value="all">Todos los Estados</option>
                             <option value="in_stock">En Depósito</option>
                             <option value="incoming">En Camino</option>
+                            <option value="reserved">Reservado</option>
                         </select>
                     </div>
                 </div>
@@ -82,6 +83,7 @@ const Stock: React.FC = () => {
                             <tr>
                                 <th>Código</th>
                                 <th>Producto</th>
+                                <th>Medida</th>
                                 <th>Estado</th>
                                 <th>Stock</th>
                                 {isOwner && <th>Costo Unit.</th>}
@@ -96,12 +98,11 @@ const Stock: React.FC = () => {
                                         <div className="product-name">{product.name}</div>
                                         <div className="product-variant">{product.color}</div>
                                     </td>
+                                    <td>{product.size || '-'}</td>
                                     <td>
-                                        {product.status === 'incoming' ? (
-                                            <span className="badge badge-warning">En Camino</span>
-                                        ) : (
-                                            <span className="badge badge-success">En Depósito</span>
-                                        )}
+                                        {product.status === 'in_stock' && <span className="badge badge-success">En Depósito</span>}
+                                        {product.status === 'incoming' && <span className="badge badge-warning">En Camino</span>}
+                                        {product.status === 'reserved' && <span className="badge badge-info">Reservado</span>}
                                     </td>
                                     <td className={product.stock <= product.minStock ? 'text-error font-bold' : ''}>
                                         {product.stock}

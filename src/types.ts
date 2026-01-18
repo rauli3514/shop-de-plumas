@@ -46,6 +46,7 @@ export interface Product {
   name: string;
   description?: string; // Nuevo
   category?: string;    // Nuevo
+  size?: string;        // Nuevo: Medida
   color: string;
   cost: number;
   price: number;
@@ -66,6 +67,7 @@ export interface Customer {
   lastName: string;
   phone: string;
   email: string;
+  cuil?: string; // Nuevo
   address: string;
   city?: string;     // Nuevo
   province?: string; // Nuevo
@@ -106,6 +108,7 @@ export interface PaymentDetails {
 export interface SaleItem {
   productId: string;
   productName: string;
+  size?: string; // Nuevo: Medida snapshot
   quantity: number;
   unitPrice: number;
   currency: Currency; // Moneda original del producto
@@ -121,6 +124,7 @@ export interface Sale {
   saleNumber: string;
   customerId: string;
   customerName: string;
+  buyerCuil?: string; // Nuevo
   customerAddress: string;
   items: SaleItem[];
   subtotal: number;
@@ -178,4 +182,14 @@ export interface DashboardStats {
   }[];
 }
 
-export type ViewType = 'pos' | 'dashboard' | 'products' | 'stock' | 'customers' | 'sales' | 'delivery-notes' | 'accounts-receivable' | 'reports' | 'admin' | 'settings';
+export interface Expense {
+  id: string;
+  description: string;
+  amount: number;
+  category: string; // 'alquiler', 'servicios', 'sueldos', 'vrios', 'impuestos', 'otros'
+  date: Date;
+  notes?: string;
+  userId?: string;
+}
+
+export type ViewType = 'pos' | 'dashboard' | 'products' | 'stock' | 'customers' | 'sales' | 'delivery-notes' | 'accounts-receivable' | 'reports' | 'expenses' | 'admin' | 'settings';

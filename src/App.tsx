@@ -12,6 +12,7 @@ import DeliveryNotes from './components/DeliveryNotes';
 import AccountsReceivable from './components/AccountsReceivable';
 import Reports from './components/Reports';
 import Admin from './components/Admin'; // Nueva vista admin
+import Expenses from './components/Expenses';
 import Login from './components/Login';
 import type { ViewType } from './types';
 
@@ -51,6 +52,8 @@ function MainApp() {
         return <AccountsReceivable />;
       case 'reports':
         return <Reports />;
+      case 'expenses':
+        return <Expenses />;
       case 'admin':
       case 'settings':
         // Reutilizo el componente Admin para ambas rutas por simplicidad

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { LayoutGrid, Package, TrendingUp, Users, FileText, Receipt, BarChart3, LogOut, ShoppingCart, DollarSign, Settings, Menu, X } from 'lucide-react';
+import { LayoutGrid, Package, TrendingUp, Users, FileText, Receipt, BarChart3, LogOut, ShoppingCart, DollarSign, Settings, Menu, X, Wallet } from 'lucide-react';
 import { COMPANY_INFO } from '../config/company';
 import type { ViewType, User } from '../types';
 import './Layout.css';
@@ -31,6 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange, on
         { id: 'sales', label: 'Historial Ventas', icon: <Receipt size={20} /> },
         { id: 'delivery-notes', label: 'Remitos', icon: <FileText size={20} /> },
         { id: 'accounts-receivable', label: 'Cuentas Corrientes', icon: <DollarSign size={20} />, restricted: true },
+        { id: 'expenses', label: 'Gastos', icon: <Wallet size={20} />, restricted: true },
         { id: 'reports', label: 'Reportes', icon: <BarChart3 size={20} />, restricted: true },
     ];
 

@@ -136,8 +136,15 @@ export const generateSalePDF = async (sale: Sale) => {
     const splitAddress = doc.splitTextToSize(sale.customerAddress, 75);
     doc.text(splitAddress, 120, yPos);
 
+    if (sale.buyerCuil) {
+        yPos += splitAddress.length * 4 + 2;
+        doc.text('CUIL/CUIT: ' + sale.buyerCuil, 120, yPos);
+    }
+    yPos += 6;
+    doc.text('Remito Asociado: ' + sale.saleNumber.replace('V', 'R'), 120, yPos);
+
     const tableData = sale.items.map(item => [
-        item.productName,
+        item.productName + (item.size ? ` (${item.size})` : ''),
         item.quantity.toString(),
         '$' + item.unitPrice.toFixed(2),
         '$' + item.subtotal.toFixed(2),
@@ -309,7 +316,7 @@ export const generateDeliveryNotePDF = async (note: DeliveryNote) => {
     const tableData = note.items.map((item, idx) => [
         (idx + 1).toString(),
         item.productId.substring(0, 10).toUpperCase(),
-        item.productName,
+        item.productName + (item.size ? ` (${item.size})` : ''),
         item.quantity.toString(),
         '___'
     ]);

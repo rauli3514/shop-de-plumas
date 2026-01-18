@@ -9,7 +9,7 @@ create table if not exists products (
   code text,
   name text not null,
   color text,
-  size text,
+  size text, -- Medida
   brand text,
   price numeric not null default 0,
   cost numeric not null default 0,
@@ -35,7 +35,7 @@ create table if not exists customers (
   city text,
   province text,
   zip_code text,
-  cuit text,
+  cuit text, -- CUIL/CUIT
   notes text,
   type text default 'retail', -- 'retail' | 'wholesale'
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
@@ -48,6 +48,7 @@ create table if not exists sales (
   sale_number serial,
   customer_id uuid references customers(id),
   customer_name text, -- Snapshot del nombre
+  buyer_cuil text, -- Nuevo: CUIL del comprador en el momento de la venta
   subtotal numeric not null default 0,
   discount numeric default 0,
   surcharge numeric default 0,
@@ -98,6 +99,18 @@ create table if not exists exchange_rates (
   date timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 6. TABLA GASTOS (Nuevo)
+create table if not exists expenses (
+  id uuid default uuid_generate_v4() primary key,
+  description text not null,
+  amount numeric not null,
+  category text, -- 'alquiler', 'servicios', etc.
+  notes text,
+  user_id text,
+  date timestamp with time zone default timezone('utc'::text, now()) not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- POLÍTICAS DE SEGURIDAD (RLS) - SIMPLE: PÚBLICO LEER/ESCRIBIR PARA MVP
 -- En producción deberías restringir esto.
 alter table products enable row level security;
@@ -105,9 +118,11 @@ alter table customers enable row level security;
 alter table sales enable row level security;
 alter table stock_movements enable row level security;
 alter table exchange_rates enable row level security;
+alter table expenses enable row level security;
 
 create policy "Acceso total a productos" on products for all using (true) with check (true);
 create policy "Acceso total a clientes" on customers for all using (true) with check (true);
 create policy "Acceso total a ventas" on sales for all using (true) with check (true);
 create policy "Acceso total a stock" on stock_movements for all using (true) with check (true);
 create policy "Acceso total a cotizaciones" on exchange_rates for all using (true) with check (true);
+create policy "Acceso total a gastos" on expenses for all using (true) with check (true);

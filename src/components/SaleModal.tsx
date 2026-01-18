@@ -137,6 +137,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
                 subtotal: qty * finalUnitPrice,
                 cost: finalCost,
                 profit: qty * (finalUnitPrice - finalCost),
+                size: product.size,
             };
             setItems([...items, newItem]);
         }
@@ -212,6 +213,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ onClose, initialProductId }) => {
         const result = await addSale({
             customerId: customerId,
             customerName: customer.name + ' ' + (customer.lastName || ''),
+            buyerCuil: customer.cuil, // Nuevo
             customerAddress: customer.address || 'Sin dirección',
             items,
             subtotal,
