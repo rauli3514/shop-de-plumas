@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/shop-de-plumas/',
+  base: '/',
   plugins: [
     react(),
     VitePWA({
@@ -18,17 +18,17 @@ export default defineConfig({
         theme_color: '#111111',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/shop-de-plumas/',
-        start_url: '/shop-de-plumas/',
+        scope: '/',
+        start_url: '/',
         orientation: 'portrait',
         icons: [
           {
-            src: '/shop-de-plumas/icons/icon-192.png',
+            src: '/icons/icon-192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/shop-de-plumas/icons/icon-512.png',
+            src: '/icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png'
           }

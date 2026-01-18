@@ -116,7 +116,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                     supabase.from('products').select('*'),
                     supabase.from('customers').select('*'),
                     supabase.from('sales').select('*'),
-                    supabase.from('users').select('*'), // Asumiendo tabla users creada manualmente o en schema
+                    supabase.from('users').select('*'),
                     supabase.from('exchange_rates').select('*'),
                     supabase.from('stock_movements').select('*'),
                     supabase.from('expenses').select('*')
@@ -128,18 +128,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 const dbProducts = pRes.data || [];
                 const dbCustomers = cRes.data || [];
                 const dbSales = sRes.data || [];
-                const dbUsers = uRes.data && uRes.data.length > 0 ? uRes.data : DEFAULT_USERS; // Si no hay users en DB, usar default
+                const dbUsers = uRes.data && uRes.data.length > 0 ? uRes.data : DEFAULT_USERS;
                 const dbRates = erRes.data || [];
                 const dbMovements = smRes.data || [];
                 const dbExpenses = exRes.data || [];
-                // NO, pRes es el PRIMER elemento. Promise.all retorna array.
-                // Necesito cambiar el destructuring en la linea 109.
-                // Como tool call reemplaza bloque, necesito asegurar que coincida.
-                // Reemplazaré el bloque de initData completo o al menos la parte de promise.all y destructuring.
 
+                setProducts(dbProducts.map(p => ({
+                    ...p,
+                    minStock: p.min_stock !== undefined ? p.min_stock : (p.minStock || 0),
+                    initialStock: p.initial_stock !== undefined ? p.initial_stock : (p.initialStock || 0),
+                    createdAt: new Date(p.created_at || p.createdAt || new Date()),
+                    updatedAt: new Date(p.updated_at || p.updatedAt || new Date()),
+                    image_url: p.image_url || p.imageUrl
+                })));
 
-                setProducts(dbProducts);
-                // Mapear clientes de snake_case (DB) a camelCase (App)
+                // Mapear clientes
                 const mapCustomerFromDB = (c: any): Customer => ({
                     id: c.id,
                     name: c.name,
@@ -149,20 +152,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                     address: c.address || '',
                     city: c.city || '',
                     province: c.province || '',
-                    cuil: c.cuit || '', // Map DB cuit to App cuil
+                    cuil: c.cuit || '',
                     notes: c.notes || '',
                     createdAt: new Date(c.created_at || c.createdAt || new Date()),
                     updatedAt: new Date(c.updated_at || c.updatedAt || new Date()),
                 });
-
                 setCustomers(dbCustomers.map(mapCustomerFromDB));
 
-                // Mapear Ventas snake_case -> camelCase
+                // Mapear Ventas
                 const mapSaleFromDB = (s: any): Sale => {
-                    // Intentar recuperar nombre de usuario si falta
                     const sellerObj = Array.isArray(dbUsers) ? dbUsers.find((u: any) => u.id === s.user_id) : null;
                     const finalUserName = s.user_name || (sellerObj ? sellerObj.name : 'Desconocido');
-
                     return {
                         id: s.id,
                         saleNumber: typeof s.sale_number === 'number' ? `V${String(s.sale_number).padStart(6, '0')}` : (s.sale_number || s.saleNumber || 'V---'),
@@ -172,6 +172,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                         items: s.items || [],
                         subtotal: s.subtotal || 0,
                         total: s.total || 0,
+                        buyerCuil: s.buyer_cuil,
                         currency: s.currency || 'ARS',
                         payment: {
                             methodId: 'db',
@@ -193,13 +194,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 };
 
                 const loadedSales = dbSales.map(mapSaleFromDB);
-
-                // Ordenar por fecha descendente
                 loadedSales.sort((a, b) => b.date.getTime() - a.date.getTime());
-
                 setSales(loadedSales);
 
-                // Generar Remitos desde las Ventas cargadas
+                // Generar Remitos Virtuales
                 const generatedDeliveryNotes: DeliveryNote[] = loadedSales.map(s => ({
                     id: s.id,
                     noteNumber: s.saleNumber.replace('V', 'R'),
@@ -223,12 +221,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                     cost: Number(m.cost || 0),
                     type: m.type,
                     date: new Date(m.date || m.created_at),
-                    notes: m.reason || m.notes || '', // Schema usa 'reason', App usa 'notes'
+                    notes: m.reason || m.notes || '',
                     userId: m.user_id || m.userId,
                 });
-
                 setStockMovements(dbMovements.map(mapMovementFromDB));
-                setUsers(dbUsers); // Si no hay en DB, usamos memoria pero NO guardamos en DB automático para no ensuciar
+
+                setUsers(dbUsers);
 
                 // Map Expenses
                 setExpenses(dbExpenses.map((e: any) => ({
@@ -241,8 +239,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                     userId: e.user_id
                 })));
 
-
-                // Tipos de cambio: Si vacío, crear default
+                // Tipos de cambio
                 if (dbRates.length === 0) {
                     const initialRate = {
                         from_currency: 'USD',
@@ -251,39 +248,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                         source: 'Inicial',
                         date: new Date().toISOString()
                     };
-                    // No insertamos automáticamente para no bloquear, solo estado
                     setExchangeRates([{ ...initialRate, id: 'temp', fromCurrency: 'USD', toCurrency: 'ARS', date: new Date() } as any]);
                 } else {
                     setExchangeRates(dbRates.map((r: any) => ({
                         ...r,
-                        fromCurrency: r.from_currency, // Mapeo de nombres snake_case a camelCase si es necesario, pero DB crea json. Revisar. supabase devuelve snake_case por defecto
+                        fromCurrency: r.from_currency,
                         toCurrency: r.to_currency
                     })));
                 }
 
-                // Mapeos adicionales si Supabase retorna snake_case y app usa camelCase
-                // En este caso, asumimos que insertamos camelCase O que DB tiene columnas snake_case.
-                // IMPORTANTE: El schema SQL usa snake_case (created_at). Interfaces usan camelCase (createdAt). 
-                // Supabase permite mapeo automático pero hay que configurarlo o hacerlo manual.
-                // Haremos un mapeo manual rápido aquí para evitar errores.
-
-                // Helper mapeo
-                const mapProduct = (p: any): Product => ({
-                    ...p,
-                    createdAt: new Date(p.created_at || p.createdAt),
-                    updatedAt: new Date(p.updated_at || p.updatedAt),
-                    // Si hay campos snake_case extra:
-                    image_url: p.image_url || p.imageUrl
-                });
-
-                setProducts(dbProducts.map(mapProduct));
-
-                // .... Resto de mapeos
-                // SIMPLIFICACION: Por ahora, confiaremos en que JS maneja los objetos, pero las fechas necesitan new Date()
-
             } catch (error) {
                 console.error("Modo Offline / Error Supabase:", error);
-                // Fallback a LocalStorage
                 const load = (k: string) => localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)!) : [];
                 setProducts(load(STORAGE_KEYS.PRODUCTS));
                 setCustomers(load(STORAGE_KEYS.CUSTOMERS));
